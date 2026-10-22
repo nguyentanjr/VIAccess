@@ -31,11 +31,11 @@ Package hiện tại: `org.tensorflow.lite.examples.shravan` (giữ nguyên tr�
 
 ## Quy trình làm việc nhóm (4 người, mỗi người một phiên Claude)
 - Trước khi làm, hỏi người dùng là ai (Tân / Tiến / Hùng / Hoàng) nếu chưa rõ, rồi đọc mục của người đó trong `PLAN.md` mục 9.
-- Mỗi việc làm trên **một nhánh riêng**: `<tên>/<việc>` (vd `tien/image-quality`). Không commit thẳng vào `main`.
-- Chỉ sửa file thuộc việc của mình (xem bảng file ở `PLAN.md` mục 5). Nếu cần sửa file dùng chung (`FeedbackCoordinator`, `FeedbackConfig`, `MainScreen`, `HapticManager`, `strings.xml`), sửa tối thiểu và ghi rõ trong mô tả PR.
+- Cả nhóm làm chung nhánh `main`. Trước khi làm: `git pull --rebase`. Commit nhỏ, mỗi commit một việc, build được rồi mới push. Push bị từ chối thì `git pull --rebase` rồi push lại; không dùng `--force`.
+- Chỉ sửa file thuộc việc của mình (xem bảng file ở `PLAN.md` mục 5). Nếu cần sửa file dùng chung (`FeedbackCoordinator`, `FeedbackConfig`, `MainScreen`, `HapticManager`, `strings.xml`), sửa tối thiểu và ghi rõ trong commit message.
 - Mọi lời nói và rung đi qua `FeedbackCoordinator`. Không gọi `ttsManager.speak` hay `vibrator` trực tiếp từ màn hình mới.
 - Mọi ngưỡng mới thêm vào `FeedbackConfig`.
-- Xong việc: build thành công → tick checkbox trong `PLAN.md` → thêm 1 dòng vào mục 12 Nhật ký → mở PR để một người khác review.
+- Xong việc: build thành công → tick checkbox trong `PLAN.md` → thêm 1 dòng vào mục 12 Nhật ký → commit + push lên `main`.
 - Đổi quyết định hay gặp vấn đề ảnh hưởng người khác: ghi vào `PLAN.md` mục 11 và báo nhóm. Không tự mở rộng phạm vi.
 - Claude không cầm được máy: sau khi sửa, nêu rõ người dùng cần thử gì trên máy thật (câu nói nào, rung thế nào thì là đúng).
 

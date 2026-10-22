@@ -156,7 +156,7 @@ Khối lượng tính theo điểm: **S = 1** (≤ nửa ngày) · **M = 2** (1�
 | **Hùng** | Tìm vật thể (T2) | Máy trạng thái Find, mẫu rung, hướng, MetricLogger | 150 ảnh P/R/F1, FP, latency | Chương T2 + kết quả detection | 19 |
 | **Hoàng** | TTS, accessibility, đánh giá người dùng | ReadingController, accessibility, Settings, onboarding | Thiết kế thử nghiệm, pilot, SUS/TLX, Wilcoxon | Chương HCI + khảo sát + kết quả người dùng; slide | 19 |
 
-**Cả nhóm:** heuristic evaluation, thử nghiệm 6–8 người (mỗi người điều phối 2 người tham gia), review chéo code (mỗi PR do 1 người khác duyệt), đọc soát báo cáo.
+**Cả nhóm:** heuristic evaluation, thử nghiệm 6–8 người (mỗi người điều phối 2 người tham gia), đọc chéo code của nhau mỗi tuần, đọc soát báo cáo.
 
 ## 8. Tiến độ (ước lượng 8 tuần, điền ngày cụ thể)
 | Tuần | Mốc | Việc |
@@ -180,7 +180,7 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 ### 9.1 Tân — luồng chính & tích hợp (20)
 - [x] Copy repo, bỏ dữ liệu / build, sửa `settings.gradle`
 - [ ] `[S]` Gửi cô bản phạm vi đã thu gọn (mục 1, 4, 6) để duyệt
-- [ ] `[M]` `git init`, đẩy lên repo nhóm, quy trình nhánh + review chéo
+- [x] `[M]` `git init`, đẩy lên repo nhóm; cả nhóm làm chung nhánh `main`
 - [x] Xóa `RoboflowAnalyzer.kt` (chứa API key)
 - [x] `[M]` Gỡ Explore / History / Themes khỏi navigation
 - [ ] `[S]` Build + chạy trên máy thật, ghi model máy test *(build OK; chưa thử máy thật)*
@@ -231,7 +231,7 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 ### 9.5 Cả nhóm
 - [ ] Heuristic evaluation nội bộ (Nielsen) — tuần 5
 - [ ] Thử nghiệm 6–8 người + A/B — mỗi người điều phối 2 người tham gia
-- [ ] Review chéo mọi PR
+- [ ] Đọc chéo code của nhau mỗi tuần
 - [ ] Đọc soát báo cáo + tập thuyết trình
 
 ### 9.6 Làm nếu còn thời gian
