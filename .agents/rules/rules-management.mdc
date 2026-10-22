@@ -1,0 +1,17 @@
+---
+description: Rule for managing MDC rules within the Gemini CLI environment.
+globs: .agents/rules/*.mdc
+---
+
+# MDC Rule Management
+
+- All new MDC rules MUST be created within the `.agents/rules/` directory.
+- Each rule MUST be a separate markdown file with the `.mdc` extension.
+- Rules MUST follow the frontmatter format:
+  ```yaml
+  ---
+  description: Brief description of the rule's purpose.
+  globs: Pattern of files this rule applies to (e.g., "**/*.kt", "src/**/*.rs").
+  ---
+  ```
+- Use descriptive filenames prefixed with the rule's primary concern (e.g., `kotlin-style.mdc`, `rust-safety.mdc`).

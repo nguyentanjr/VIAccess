@@ -1,0 +1,12 @@
+---
+description: Naming and location conventions for application resources.
+globs: "app/src/main/res/**"
+---
+
+# Resource Conventions
+
+- **Icons:** App icon MUST be named `ic_launcher` and `ic_launcher_round` (PNG format).
+- **Strings:** All UI strings MUST be in `strings.xml`. Use descriptive keys (e.g., `nav_explore`, `settings_language`).
+- **Localization:** Provide `values-vi/strings.xml` for Vietnamese translations.
+- **Animations:** Transitions should prefer fade in/out using `Crossfade` or `AnimatedContent`.
+- **Fonts:** Use `Inter` font family for all text elements.

@@ -1,0 +1,29 @@
+---
+description: Best practices for authoring Android applications with Kotlin and Jetpack Compose.
+globs: "**/*.kt"
+---
+
+# Android Kotlin & Jetpack Compose Best Practices
+
+## State Management
+- Use `remember` and `mutableStateOf` for local UI state.
+- Prefer `StateFlow` or `LiveData` in ViewModels for persistent state.
+- Always use `collectAsStateWithLifecycle()` to observe flows in a lifecycle-aware manner.
+
+## Composition & Performance
+- Keep composables small, focused, and stateless (hoist state).
+- Use `Modifier` as the first optional parameter of every composable.
+- Avoid heavy computations inside composables; use `LaunchedEffect` or `remember` with keys.
+- Use `LazyColumn`/`LazyRow` for large lists to ensure efficient rendering.
+
+## Accessibility
+- Provide `contentDescription` for all interactive and informative UI elements.
+- Ensure minimum touch target sizes of 48x48dp.
+- Use Semantic properties to provide extra context to screen readers.
+- In this project, prioritize TTS and Haptic feedback as per [SPECS.md](../specs/SPECS.md).
+- **Font:** Use `Inter` font family for all text elements as per `resource-conventions.mdc`.
+
+## Architecture
+- Strictly follow MVVM or MVI patterns.
+- Inject dependencies (like `SettingsManager`, `TTSManager`) via constructor or CompositionLocal where appropriate.
+- Maintain a clear separation between UI logic and business logic.

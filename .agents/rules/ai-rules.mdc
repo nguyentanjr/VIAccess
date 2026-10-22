@@ -1,0 +1,11 @@
+---
+description: Requirements and safety for LLM and AI models.
+globs: "**/*.{kt,py,tflite}"
+---
+
+# AI & LLM Rules
+
+- **API Keys:** NEVER use API keys for LLMs. All inference MUST be on-device or locally integrated.
+- **Model Storage:** Store `.tflite` models in `app/src/main/assets/`.
+- **Inference:** Ensure long-running inference (like speech-to-intent) does not block the UI thread.
+- **Voice Recognition:** Implement robust debouncing and cancellation logic for voice command sessions.
