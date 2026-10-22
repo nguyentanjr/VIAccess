@@ -36,6 +36,7 @@
     <string name="find_greeting">Find mode</string>
     <string name="ocr_greeting">OCR</string>
     <string name="back_command">Back</string>
+    <string name="ocr_no_text">No text to read</string>
     <string name="too_close">%s too close!</string>
     <string name="speak_description">Speak</string>
     <string name="voice_keyword_help">help</string>

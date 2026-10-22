@@ -25,9 +25,8 @@ import org.tensorflow.lite.examples.shravan.utils.*
 @Composable
 fun OCRScreen(
     onBack: () -> Unit,
-    ttsManager: TTSManager,
+    feedback: FeedbackCoordinator,
     settingsManager: SettingsManager,
-    hapticManager: HapticManager,
     voiceCommandManager: VoiceCommandManager,
     isActive: Boolean = true,
     ocrManager: OCRManager? = null,
@@ -61,7 +60,7 @@ fun OCRScreen(
                                 currentText = text
                                 // Automatic reading logic
                                 if (ocrManager?.shouldSpeak(text) == true) {
-                                    ttsManager.speak(text, isVietnamese = containsVietnamese(text))
+                                    feedback.say(text, Priority.STATE, key = "ocr:auto", isVietnamese = containsVietnamese(text))
                                 }
                             }
                         }
@@ -92,20 +91,22 @@ fun OCRScreen(
     val voiceSessionId = remember { mutableStateOf<Int?>(null) }
 
     BackHandler {
-        hapticManager.triggerHaptic()
+        feedback.vibrate(force = true)
         onBack()
     }
 
     val ocrGreeting = stringResource(R.string.ocr_greeting)
     val backCommand = stringResource(R.string.back_command)
+    val noText = stringResource(R.string.ocr_no_text)
 
     LaunchedEffect(isActive) {
         if (isActive) {
             ocrManager?.clear()
-            ttsManager.speak(
+            feedback.say(
                 ocrGreeting,
-                isVietnamese = useVietnamese,
-                onComplete = {
+                Priority.STATE,
+                userInitiated = true,
+                onDone = {
                     scope.launch {
                         delay(1000)
                         interactionsEnabled = true
@@ -116,16 +117,12 @@ fun OCRScreen(
             voiceSessionId.value = voiceCommandManager.startListening(isVietnamese = useVietnamese) { result ->
                 val lowerResult = result.lowercase()
                 if (lowerResult.contains(backCommand.lowercase())) {
-                    ttsManager.speak(backCommand, isVietnamese = useVietnamese)
-                    hapticManager.triggerHaptic()
+                    feedback.say(backCommand, Priority.STATE, userInitiated = true)
+                    feedback.vibrate(force = true)
                     onBack()
                 } else if (lowerResult.contains("đọc") || lowerResult.contains("read")) {
-                    hapticManager.triggerHaptic()
-                    if (currentText.isBlank()) {
-                        ttsManager.speak(if (useVietnamese) "Không có văn bản nào" else "No text to read", isVietnamese = useVietnamese)
-                    } else {
-                        ttsManager.speak(currentText, isVietnamese = containsVietnamese(currentText))
-                    }
+                    feedback.vibrate(force = true)
+                    readCurrent(feedback, currentText, noText)
                 }
             }
         } else {
@@ -146,12 +143,8 @@ fun OCRScreen(
                 .fillMaxSize()
                 .clickable {
                     if (interactionsEnabled) {
-                        hapticManager.triggerHaptic()
-                        if (currentText.isBlank()) {
-                            ttsManager.speak(if (useVietnamese) "Không có văn bản nào" else "No text to read", isVietnamese = useVietnamese)
-                        } else {
-                            ttsManager.speak(currentText, isVietnamese = containsVietnamese(currentText))
-                        }
+                        feedback.vibrate(force = true)
+                        readCurrent(feedback, currentText, noText)
                     }
                 },
             contentAlignment = Alignment.BottomCenter
@@ -168,6 +161,14 @@ fun OCRScreen(
                 )
             }
         }
+    }
+}
+
+private fun readCurrent(feedback: FeedbackCoordinator, text: String, noText: String) {
+    if (text.isBlank()) {
+        feedback.say(noText, Priority.STATE, userInitiated = true)
+    } else {
+        feedback.say(text, Priority.STATE, key = "ocr:manual", isVietnamese = containsVietnamese(text), userInitiated = true)
     }
 }
 

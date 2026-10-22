@@ -30,9 +30,12 @@ import org.tensorflow.lite.examples.shravan.utils.*
 
 class MainActivity : ComponentActivity() {
     private var ttsManagerInstance: TTSManager? = null
+    private var feedbackInstance: FeedbackCoordinator? = null
 
     override fun onPause() {
         super.onPause()
+        // Dừng cả hàng đợi của Coordinator, nếu không lời kế tiếp sẽ phát khi app đang ở nền.
+        feedbackInstance?.stopSpeech()
         ttsManagerInstance?.stopAll()
     }
 
@@ -84,7 +87,13 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                if (settingsManager == null || ttsManager == null || 
+                val feedback = remember(ttsManager, hapticManager, settingsManager) {
+                    if (ttsManager != null && hapticManager != null && settingsManager != null)
+                        createFeedbackCoordinator(ttsManager, hapticManager, settingsManager).also { feedbackInstance = it }
+                    else null
+                }
+
+                if (feedback == null || settingsManager == null || ttsManager == null || 
                     hapticManager == null || voiceCommandManager == null) {
                     // Critical failure, show simple error
                     Surface(modifier = Modifier.fillMaxSize(), color = Color.Black) {
@@ -206,6 +215,7 @@ CompositionLocalProvider(LocalConfiguration provides overriddenConfiguration) {
                                         settingsManager = settingsManager,
                                         ttsManager = ttsManager,
                                         hapticManager = hapticManager,
+                                        feedback = feedback,
                                         voiceCommandManager = voiceCommandManager,
                                         onReset = {
                                             settingsManager.clearAll()

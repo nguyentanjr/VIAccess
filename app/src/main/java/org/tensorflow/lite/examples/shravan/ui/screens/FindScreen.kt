@@ -44,8 +44,7 @@ import org.tensorflow.lite.examples.shravan.utils.*
 @OptIn(ExperimentalTextApi::class)
 @Composable
 fun FindScreen(
-    ttsManager: TTSManager,
-    hapticManager: HapticManager,
+    feedback: FeedbackCoordinator,
     voiceCommandManager: VoiceCommandManager,
     settingsManager: SettingsManager,
     isActive: Boolean = true,
@@ -83,25 +82,25 @@ fun FindScreen(
     
     LaunchedEffect(isActive, settingsManager.useVietnamese) {
         if (isActive) {
-            ttsManager.speak(findGreeting, isVietnamese = settingsManager.useVietnamese)
+            feedback.say(findGreeting, Priority.STATE, userInitiated = true)
         }
     }
 
     LaunchedEffect(activeMode, isActive) {
         if (isActive) {
             if (activeMode == null) {
-                ttsManager.speak(findPrompt, isQueued = true, isVietnamese = settingsManager.useVietnamese)
+                feedback.say(findPrompt, Priority.STATE, queue = true)
                 voiceSessionId = voiceCommandManager.startListening(isVietnamese = settingsManager.useVietnamese) { result ->
                     val lowerResult = result.lowercase()
                     if (lowerResult.contains(modeSeatingsTables.lowercase()) || lowerResult.contains("seat") || lowerResult.contains("table") || lowerResult.contains("bàn") || lowerResult.contains("ghế")) {
                         activeMode = "seatings & tables"
-                        hapticManager.triggerHaptic()
+                        feedback.vibrate(force = true)
                     } else if (lowerResult.contains(modeDoorsWindows.lowercase()) || lowerResult.contains("door") || lowerResult.contains("window") || lowerResult.contains("cửa")) {
                         activeMode = "doors & windows"
-                        hapticManager.triggerHaptic()
+                        feedback.vibrate(force = true)
                     } else if (lowerResult.contains(modePersonVehicles.lowercase()) || lowerResult.contains("person") || lowerResult.contains("vehicle") || lowerResult.contains("người") || lowerResult.contains("xe")) {
                         activeMode = "person & vehicles"
-                        hapticManager.triggerHaptic()
+                        feedback.vibrate(force = true)
                     }
                 }
             } else {
@@ -116,7 +115,7 @@ fun FindScreen(
                     else -> ""
                 }
                 val lookingForText = context.getString(R.string.find_looking_for, modeLabel)
-                ttsManager.speak(lookingForText, isVietnamese = settingsManager.useVietnamese)
+                feedback.say(lookingForText, Priority.STATE, userInitiated = true)
             }
         } else {
             voiceSessionId?.let {
@@ -176,7 +175,7 @@ fun FindScreen(
                     // Interval scales from 1000ms (far) to 100ms (very close)
                     val interval = (1000 - (normalizedArea * 900)).toLong().coerceAtLeast(100L)
                     
-                    hapticManager.triggerHaptic()
+                    feedback.vibrate()
                     delay(interval)
                 } else {
                     delay(500)
@@ -249,7 +248,7 @@ fun FindScreen(
         ) {
             // Button 1
             Box(
-                modifier = Modifier.size(width = 80.dp, height = 50.dp).clip(RoundedCornerShape(12.dp)).background(seatingBgColor).clickable { activeMode = "seatings & tables"; hapticManager.triggerHaptic() },
+                modifier = Modifier.size(width = 80.dp, height = 50.dp).clip(RoundedCornerShape(12.dp)).background(seatingBgColor).clickable { activeMode = "seatings & tables"; feedback.vibrate(force = true) },
                 contentAlignment = Alignment.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -260,7 +259,7 @@ fun FindScreen(
             }
             // Button 2
             Box(
-                modifier = Modifier.size(width = 80.dp, height = 50.dp).clip(RoundedCornerShape(12.dp)).background(doorsBgColor).clickable { activeMode = "doors & windows"; hapticManager.triggerHaptic() },
+                modifier = Modifier.size(width = 80.dp, height = 50.dp).clip(RoundedCornerShape(12.dp)).background(doorsBgColor).clickable { activeMode = "doors & windows"; feedback.vibrate(force = true) },
                 contentAlignment = Alignment.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -271,7 +270,7 @@ fun FindScreen(
             }
             // Button 3
             Box(
-                modifier = Modifier.size(width = 80.dp, height = 50.dp).clip(RoundedCornerShape(12.dp)).background(personBgColor).clickable { activeMode = "person & vehicles"; hapticManager.triggerHaptic() },
+                modifier = Modifier.size(width = 80.dp, height = 50.dp).clip(RoundedCornerShape(12.dp)).background(personBgColor).clickable { activeMode = "person & vehicles"; feedback.vibrate(force = true) },
                 contentAlignment = Alignment.Center
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {

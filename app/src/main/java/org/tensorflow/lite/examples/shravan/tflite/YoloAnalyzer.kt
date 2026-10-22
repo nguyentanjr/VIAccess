@@ -9,16 +9,17 @@ import android.os.Vibrator
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import org.tensorflow.lite.examples.shravan.utils.FeedbackConfig
+import org.tensorflow.lite.examples.shravan.utils.FeedbackCoordinator
+import org.tensorflow.lite.examples.shravan.utils.Priority
 import org.tensorflow.lite.examples.shravan.utils.ImageUtils
 import org.tensorflow.lite.examples.shravan.utils.SettingsManager
-import org.tensorflow.lite.examples.shravan.utils.TTSManager
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.*
 
 class YoloAnalyzer(
     private val context: Context,
-    private val ttsManager: TTSManager,
+    private val feedback: FeedbackCoordinator,
     private val settingsManager: SettingsManager,
     private val modelName: String = "yolov5s-fp16.tflite",
     var onResults: ((List<Classifier.Recognition>) -> Unit)? = null
@@ -158,7 +159,7 @@ class YoloAnalyzer(
 
                     val lastSeen = lastSeenTime[announcement] ?: 0L
                     if (currentTime - lastSeen > currentDebounce) {
-                        ttsManager.speak(announcement, isQueued = true, isVietnamese = settingsManager.useVietnamese)
+                        feedback.say(announcement, Priority.INFO, key = "object:$announcement")
                     }
                     lastSeenTime[announcement] = currentTime
                 }

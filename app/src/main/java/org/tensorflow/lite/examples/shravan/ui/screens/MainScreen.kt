@@ -44,6 +44,7 @@ fun MainScreen(
     settingsManager: SettingsManager,
     ttsManager: TTSManager,
     hapticManager: HapticManager,
+    feedback: FeedbackCoordinator,
     voiceCommandManager: VoiceCommandManager,
     onReset: () -> Unit
 ) {
@@ -65,7 +66,7 @@ fun MainScreen(
     }
     val ocrManager = remember { OCRManager(context) }
     val yoloAnalyzer = remember { 
-        YoloAnalyzer(context, ttsManager, settingsManager)
+        YoloAnalyzer(context, feedback, settingsManager)
     }
     
     var ocrAnalyzer by remember { mutableStateOf<ImageAnalysis.Analyzer?>(null) }
@@ -147,8 +148,8 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
                 // Help / orientation check
                 if (trimmedResult.contains(kHelp) || trimmedResult.contains(kWhereAmI) || trimmedResult.contains("help") || trimmedResult.contains("where am i")) {
                     val currentScreenName = context.getString(screens[currentPage].first)
-                    ttsManager.speak(String.format(locationFormat, currentScreenName), isVietnamese = settingsManager.useVietnamese)
-                    if (settingsManager.hapticsEnabled) hapticManager.triggerHaptic()
+                    feedback.say(String.format(locationFormat, currentScreenName), Priority.STATE, userInitiated = true)
+                    feedback.vibrate(force = true)
                     handled = true
                 }
 
@@ -274,8 +275,7 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
                     val isActive = currentPage == targetPage
                     when (targetPage) {
                         PAGE_FIND -> FindScreen(
-                            ttsManager = ttsManager,
-                            hapticManager = hapticManager,
+                            feedback = feedback,
                             voiceCommandManager = voiceCommandManager,
                             settingsManager = settingsManager,
                             isActive = isActive,
@@ -283,9 +283,8 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
                         )
                         PAGE_OCR -> OCRScreen(
                             onBack = { currentPage = PAGE_FIND },
-                            ttsManager = ttsManager,
+                            feedback = feedback,
                             settingsManager = settingsManager,
-                            hapticManager = hapticManager,
                             voiceCommandManager = voiceCommandManager,
                             isActive = isActive,
                             ocrManager = ocrManager,

@@ -182,10 +182,10 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 - [ ] `[S]` Gửi cô bản phạm vi đã thu gọn (mục 1, 4, 6) để duyệt
 - [ ] `[M]` `git init`, đẩy lên repo nhóm, quy trình nhánh + review chéo
 - [x] Xóa `RoboflowAnalyzer.kt` (chứa API key)
-- [ ] `[M]` Gỡ Explore / History / Themes khỏi navigation
-- [ ] `[S]` Build + chạy trên máy thật, ghi model máy test
-- [ ] `[S]` Tạo `FeedbackConfig.kt`
-- [ ] `[L]` `FeedbackCoordinator` (hàng đợi ưu tiên, cooldown, giới hạn) + chuyển mọi lời nói qua Coordinator
+- [x] `[M]` Gỡ Explore / History / Themes khỏi navigation
+- [ ] `[S]` Build + chạy trên máy thật, ghi model máy test *(build OK; chưa thử máy thật)*
+- [x] `[S]` Tạo `FeedbackConfig.kt`
+- [x] `[L]` `FeedbackCoordinator` (hàng đợi ưu tiên, cooldown, giới hạn) + chuyển mọi lời nói qua Coordinator *(Find, OCR, YOLO, MainScreen; Setup/Tutorial/Settings/AccessibleButton còn gọi trực tiếp — Hoàng chuyển khi làm onboarding/Settings)*
 - [ ] `[M]` 5 lệnh giọng nói + nút chạm dự phòng
 - [ ] `[M]` Xử lý lỗi bằng giọng nói (thiếu quyền, thiếu giọng TTS tiếng Việt, mất mạng, lỗi mô hình) + dừng TTS / rung / camera khi app chạy nền
 - [ ] `[S]` Chủ trì checklist kiểm thử chức năng (6.1)
@@ -253,8 +253,12 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 - Bỏ Roboflow / Currency: cần mạng + API key, trái nguyên tắc xử lý trên thiết bị.
 - Bỏ module `:tensorflow-lite` khỏi `settings.gradle`: thư mục không tồn tại (TFLite lấy từ Maven).
 - Không dùng số liệu đánh giá của Nhóm 2 (là dữ liệu giả lập).
+- Build: Gradle 8.5 + AGP 8.2.2 + JDK 21 (bản JDK đi kèm Android Studio). Bỏ `org.gradle.java.home` viết cứng.
+- Trang trong MainScreen: 0 = Tìm vật, 1 = Đọc chữ, 2 = Cài đặt. Bỏ lệnh giờ / pin / trạng thái, giữ "giúp đỡ".
+- Cách dùng Coordinator: `feedback.say(text, Priority.X, key = ..., queue = ..., userInitiated = ...)` và `feedback.vibrate(pattern, force)`. Lời do người dùng yêu cầu thì `userInitiated = true`; rung xác nhận thì `force = true`.
 
 ## 12. Nhật ký
 | Ngày | Ai | Ghi chú |
 |---|---|---|
 | 2026-10-19 | — | Tạo repo VIAccess từ VisionAid, viết CLAUDE.md / PLAN.md |
+| 2026-10-22 | Tân | Nhánh tan/foundation: sửa build, gỡ Explore/History/Themes, FeedbackConfig, FeedbackCoordinator + 8 unit test |

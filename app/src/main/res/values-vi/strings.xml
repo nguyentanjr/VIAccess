@@ -36,6 +36,7 @@
     <string name="find_greeting">Chế độ tìm kiếm</string>
     <string name="ocr_greeting">Đọc văn bản</string>
     <string name="back_command">Quay lại</string>
+    <string name="ocr_no_text">Không có văn bản nào</string>
     <string name="too_close">%s quá gần!</string>
     <string name="speak_description">Đọc</string>
     <string name="voice_keyword_help">giúp đỡ</string>
