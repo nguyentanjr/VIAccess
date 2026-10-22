@@ -20,7 +20,6 @@
 ## Quy tắc
 - Chỉ làm việc của mình (PLAN.md mục 9). Không tự thêm tính năng ngoài phạm vi.
 - Không commit thẳng vào `main`.
-- Phải **hiểu code mình nộp**, vì cô sẽ hỏi khi thuyết trình.
 - Vướng mắc hoặc muốn đổi quyết định: ghi vào PLAN.md mục 11 và báo nhóm.
 
 ## Thứ tự
