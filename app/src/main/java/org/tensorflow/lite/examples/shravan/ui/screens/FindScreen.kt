@@ -48,7 +48,6 @@ fun FindScreen(
     hapticManager: HapticManager,
     voiceCommandManager: VoiceCommandManager,
     settingsManager: SettingsManager,
-    historyManager: HistoryManager,
     isActive: Boolean = true,
     yoloAnalyzer: YoloAnalyzer? = null
 ) {

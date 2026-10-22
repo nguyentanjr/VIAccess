@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.TextFields
@@ -37,6 +34,10 @@ import org.tensorflow.lite.examples.shravan.tflite.YoloAnalyzer
 import org.tensorflow.lite.examples.shravan.ui.components.CameraPreview
 import org.tensorflow.lite.examples.shravan.utils.*
 
+private const val PAGE_FIND = 0
+private const val PAGE_OCR = 1
+private const val PAGE_SETTINGS = 2
+
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen(
@@ -44,7 +45,6 @@ fun MainScreen(
     ttsManager: TTSManager,
     hapticManager: HapticManager,
     voiceCommandManager: VoiceCommandManager,
-    historyManager: HistoryManager,
     onReset: () -> Unit
 ) {
     val context = LocalContext.current
@@ -61,11 +61,11 @@ fun MainScreen(
     val navBarColor = if (resetCount > 0) Color.Red.copy(alpha = redAlpha) else Color.Black
 
     LaunchedEffect(currentPage) {
-        if (currentPage != 4) resetCount = 0
+        if (currentPage != PAGE_SETTINGS) resetCount = 0
     }
     val ocrManager = remember { OCRManager(context) }
     val yoloAnalyzer = remember { 
-        YoloAnalyzer(context, ttsManager, settingsManager, historyManager)
+        YoloAnalyzer(context, ttsManager, settingsManager)
     }
     
     var ocrAnalyzer by remember { mutableStateOf<ImageAnalysis.Analyzer?>(null) }
@@ -83,17 +83,13 @@ fun MainScreen(
 // Update the delegate reactively
 LaunchedEffect(currentPage, ocrAnalyzer) {
     stableCompositeAnalyzer.delegate = when (currentPage) {
-        0 -> {
-            yoloAnalyzer.allowedClasses = null
-            yoloAnalyzer
-        }
-        1 -> yoloAnalyzer // FindScreen sets allowedClasses
-        2 -> ocrAnalyzer
+        PAGE_FIND -> yoloAnalyzer // FindScreen sets allowedClasses
+        PAGE_OCR -> ocrAnalyzer
         else -> null
     }
 }
 
-val activeAnalyzer = if (currentPage < 3) stableCompositeAnalyzer else null
+val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer else null
 
     // Centralized Flash Control
     LaunchedEffect(settingsManager.flashMode) {
@@ -105,37 +101,26 @@ val activeAnalyzer = if (currentPage < 3) stableCompositeAnalyzer else null
     }
 
     val screens = listOf(
-        Triple(R.string.nav_explore, Icons.Default.CameraAlt, "explore"),
         Triple(R.string.nav_find, Icons.Default.Search, "find"),
         Triple(R.string.nav_ocr, Icons.Default.TextFields, "ocr"),
-        Triple(R.string.nav_settings, Icons.Default.Settings, "settings"),
-        Triple(R.string.nav_history, Icons.Default.History, "history")
+        Triple(R.string.nav_settings, Icons.Default.Settings, "settings")
     )
 
-    val kExplore = stringResource(R.string.voice_keyword_explore).lowercase()
     val kFind = stringResource(R.string.voice_keyword_find).lowercase()
     val kOcr = stringResource(R.string.voice_keyword_ocr).lowercase()
     val kSettings = stringResource(R.string.voice_keyword_settings).lowercase()
-    val kHistory = stringResource(R.string.voice_keyword_history).lowercase()
 
-    val navKeywords = remember(kExplore, kFind, kOcr, kSettings, kHistory) {
+    val navKeywords = remember(kFind, kOcr, kSettings) {
         listOf(
-            kExplore to 0,
-            kFind to 1,
-            kOcr to 2,
-            kSettings to 3,
-            kHistory to 4
+            kFind to PAGE_FIND,
+            kOcr to PAGE_OCR,
+            kSettings to PAGE_SETTINGS
         )
     }
 
-    val kTime = stringResource(R.string.voice_keyword_time).lowercase()
-    val kBattery = stringResource(R.string.voice_keyword_battery).lowercase()
-    val kStatus = stringResource(R.string.voice_keyword_status).lowercase()
     val kHelp = stringResource(R.string.voice_keyword_help).lowercase()
     val kWhereAmI = stringResource(R.string.voice_keyword_where_am_i).lowercase()
 
-    val timeFormat = stringResource(R.string.status_time)
-    val batteryFormat = stringResource(R.string.status_battery)
     val locationFormat = stringResource(R.string.status_location)
 
     // Single Haptic Trigger
@@ -145,7 +130,7 @@ val activeAnalyzer = if (currentPage < 3) stableCompositeAnalyzer else null
         }
         
         // If moving away from camera pages, reset camera ready
-        if (currentPage >= 4) {
+        if (currentPage == PAGE_SETTINGS) {
             isCameraReady = false
         }
     }
@@ -159,20 +144,8 @@ val activeAnalyzer = if (currentPage < 3) stableCompositeAnalyzer else null
                 val trimmedResult = result.trim().lowercase()
                 var handled = false
                 
-                // Quick Status & Help Check
-                if (trimmedResult.contains(kTime) || trimmedResult.contains(kStatus) || trimmedResult.contains("time") || trimmedResult.contains("status")) {
-                    val sdf = java.text.SimpleDateFormat("hh:mm a", java.util.Locale.getDefault())
-                    val currentTime = sdf.format(java.util.Date())
-                    ttsManager.speak(String.format(timeFormat, currentTime), isVietnamese = settingsManager.useVietnamese)
-                    if (settingsManager.hapticsEnabled) hapticManager.triggerHaptic()
-                    handled = true
-                } else if (trimmedResult.contains(kBattery) || trimmedResult.contains("battery")) {
-                    val bm = context.getSystemService(android.content.Context.BATTERY_SERVICE) as android.os.BatteryManager
-                    val batLevel = bm.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
-                    ttsManager.speak(String.format(batteryFormat, batLevel), isVietnamese = settingsManager.useVietnamese)
-                    if (settingsManager.hapticsEnabled) hapticManager.triggerHaptic()
-                    handled = true
-                } else if (trimmedResult.contains(kHelp) || trimmedResult.contains(kWhereAmI) || trimmedResult.contains("help") || trimmedResult.contains("where am i")) {
+                // Help / orientation check
+                if (trimmedResult.contains(kHelp) || trimmedResult.contains(kWhereAmI) || trimmedResult.contains("help") || trimmedResult.contains("where am i")) {
                     val currentScreenName = context.getString(screens[currentPage].first)
                     ttsManager.speak(String.format(locationFormat, currentScreenName), isVietnamese = settingsManager.useVietnamese)
                     if (settingsManager.hapticsEnabled) hapticManager.triggerHaptic()
@@ -243,7 +216,7 @@ val activeAnalyzer = if (currentPage < 3) stableCompositeAnalyzer else null
                             totalDrag += dragAmount
                             if (java.lang.Math.abs(totalDrag) > swipeThreshold) {
                                 val targetPage = if (totalDrag < 0) {
-                                    (currentPage + 1).coerceAtMost(5)
+                                    (currentPage + 1).coerceAtMost(screens.lastIndex)
                                 } else {
                                     (currentPage - 1).coerceAtLeast(0)
                                 }
@@ -257,8 +230,8 @@ val activeAnalyzer = if (currentPage < 3) stableCompositeAnalyzer else null
                 }
         ) {
             // Shared CameraPreview layer
-            if (currentPage < 4) {
-                val zoom = if (currentPage == 0 || currentPage == 1) 0.6f else 1.0f
+            if (currentPage != PAGE_SETTINGS) {
+                val zoom = if (currentPage == PAGE_FIND) 0.6f else 1.0f
                 CameraPreview(
                     modifier = Modifier.fillMaxSize(),
                     zoomRatio = zoom,
@@ -269,7 +242,7 @@ val activeAnalyzer = if (currentPage < 3) stableCompositeAnalyzer else null
             }
 
             // Crossfade between Spinner and Camera
-            if (currentPage < 4) {
+            if (currentPage != PAGE_SETTINGS) {
                 AnimatedVisibility(
                     visible = !isCameraReady,
                     enter = fadeIn(),
@@ -300,36 +273,25 @@ val activeAnalyzer = if (currentPage < 3) stableCompositeAnalyzer else null
                 Box(modifier = Modifier.fillMaxSize()) {
                     val isActive = currentPage == targetPage
                     when (targetPage) {
-                        0 -> ExploreScreen(
+                        PAGE_FIND -> FindScreen(
                             ttsManager = ttsManager,
                             hapticManager = hapticManager,
                             voiceCommandManager = voiceCommandManager,
                             settingsManager = settingsManager,
-                            historyManager = historyManager,
                             isActive = isActive,
                             yoloAnalyzer = yoloAnalyzer
                         )
-                        1 -> FindScreen(
-                            ttsManager = ttsManager,
-                            hapticManager = hapticManager,
-                            voiceCommandManager = voiceCommandManager,
-                            settingsManager = settingsManager,
-                            historyManager = historyManager,
-                            isActive = isActive,
-                            yoloAnalyzer = yoloAnalyzer
-                        )
-                        2 -> OCRScreen(
-                            onBack = { currentPage = 0 },
+                        PAGE_OCR -> OCRScreen(
+                            onBack = { currentPage = PAGE_FIND },
                             ttsManager = ttsManager,
                             settingsManager = settingsManager,
-                            historyManager = historyManager,
                             hapticManager = hapticManager,
                             voiceCommandManager = voiceCommandManager,
                             isActive = isActive,
                             ocrManager = ocrManager,
                             onProvideAnalyzer = { ocrAnalyzer = it }
                         )
-                        3 -> Box(modifier = Modifier.fillMaxSize().background(Color(0xFF222222)).padding(innerPadding)) {
+                        PAGE_SETTINGS -> Box(modifier = Modifier.fillMaxSize().background(Color(0xFF222222)).padding(innerPadding)) {
                             SettingsScreen(
                                 ttsManager = ttsManager, 
                                 hapticManager = hapticManager, 
@@ -340,9 +302,6 @@ val activeAnalyzer = if (currentPage < 3) stableCompositeAnalyzer else null
                                 resetCount = resetCount,
                                 onResetClick = { resetCount++ }
                             )
-                        }
-                        4 -> Box(modifier = Modifier.fillMaxSize().background(Color(0xFF222222)).padding(innerPadding)) {
-                            HistoryScreen(onBack = { currentPage = 0 }, historyManager = historyManager, settingsManager = settingsManager, ttsManager = ttsManager, hapticManager = hapticManager, voiceCommandManager = voiceCommandManager, isActive = isActive)
                         }
                     }
                 }

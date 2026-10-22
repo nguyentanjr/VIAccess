@@ -27,7 +27,6 @@ fun OCRScreen(
     onBack: () -> Unit,
     ttsManager: TTSManager,
     settingsManager: SettingsManager,
-    historyManager: HistoryManager,
     hapticManager: HapticManager,
     voiceCommandManager: VoiceCommandManager,
     isActive: Boolean = true,
@@ -63,7 +62,6 @@ fun OCRScreen(
                                 // Automatic reading logic
                                 if (ocrManager?.shouldSpeak(text) == true) {
                                     ttsManager.speak(text, isVietnamese = containsVietnamese(text))
-                                    historyManager.addHistory("OCR", text)
                                 }
                             }
                         }
@@ -127,7 +125,6 @@ fun OCRScreen(
                         ttsManager.speak(if (useVietnamese) "Không có văn bản nào" else "No text to read", isVietnamese = useVietnamese)
                     } else {
                         ttsManager.speak(currentText, isVietnamese = containsVietnamese(currentText))
-                        historyManager.addHistory("OCR", currentText)
                     }
                 }
             }
@@ -154,7 +151,6 @@ fun OCRScreen(
                             ttsManager.speak(if (useVietnamese) "Không có văn bản nào" else "No text to read", isVietnamese = useVietnamese)
                         } else {
                             ttsManager.speak(currentText, isVietnamese = containsVietnamese(currentText))
-                            historyManager.addHistory("OCR", currentText)
                         }
                     }
                 },

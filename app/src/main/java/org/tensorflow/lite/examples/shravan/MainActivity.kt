@@ -59,12 +59,6 @@ class MainActivity : ComponentActivity() {
                         null 
                     }
                 }
-                val historyManager = remember { 
-                    try { HistoryManager(context) } catch (e: Throwable) { 
-                        android.util.Log.e("MainActivity", "HistoryManager init failed", e)
-                        null 
-                    }
-                }
                 val ttsManager = remember { 
                     try { 
                         val manager = TTSManager(context)
@@ -90,7 +84,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                if (settingsManager == null || historyManager == null || ttsManager == null || 
+                if (settingsManager == null || ttsManager == null || 
                     hapticManager == null || voiceCommandManager == null) {
                     // Critical failure, show simple error
                     Surface(modifier = Modifier.fillMaxSize(), color = Color.Black) {
@@ -213,10 +207,8 @@ CompositionLocalProvider(LocalConfiguration provides overriddenConfiguration) {
                                         ttsManager = ttsManager,
                                         hapticManager = hapticManager,
                                         voiceCommandManager = voiceCommandManager,
-                                        historyManager = historyManager,
                                         onReset = {
                                             settingsManager.clearAll()
-                                            historyManager.clearHistory()
                                             (context as? android.app.Activity)?.finishAffinity()
                                         }
                                     )
