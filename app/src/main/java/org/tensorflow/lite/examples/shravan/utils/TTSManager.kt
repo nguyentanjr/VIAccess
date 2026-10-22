@@ -18,6 +18,8 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
     private var lastIsVietnamese: Boolean = false
     private var currentSpeechRate: Float = 1.0f
     private var onCompletionListener: (() -> Unit)? = null
+    private var currentUtteranceId: String? = null
+    private var utteranceCounter = 0
     private val mainHandler = Handler(Looper.getMainLooper())
     private var loudnessEnhancer: LoudnessEnhancer? = null
     private var audioSessionId: Int = -1
@@ -73,30 +75,28 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
     private fun setupProgressListener() {
         tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
             override fun onStart(utteranceId: String?) {}
-            override fun onDone(utteranceId: String?) {
-                lastSpeechEndTime = System.currentTimeMillis()
-                mainHandler.post {
-                    onCompletionListener?.invoke()
-                    onCompletionListener = null
-                }
-            }
+            override fun onDone(utteranceId: String?) = finish(utteranceId)
             override fun onError(utteranceId: String?) {
                 Log.e("TTSManager", "Utterance error: $utteranceId")
-                lastSpeechEndTime = System.currentTimeMillis()
-                mainHandler.post {
-                    onCompletionListener?.invoke()
-                    onCompletionListener = null
-                }
+                finish(utteranceId)
             }
-            override fun onStop(utteranceId: String?, interrupted: Boolean) {
-                lastSpeechEndTime = System.currentTimeMillis()
-                mainHandler.post {
-                    onCompletionListener?.invoke()
-                    onCompletionListener = null
-                }
-            }
+            override fun onStop(utteranceId: String?, interrupted: Boolean) = finish(utteranceId)
         })
     }
+
+    /** Chỉ gọi callback của đúng lời vừa kết thúc; lời cũ bị ngắt không được gọi callback của lời mới. */
+    private fun finish(utteranceId: String?) {
+        lastSpeechEndTime = System.currentTimeMillis()
+        mainHandler.post {
+            if (utteranceId == currentUtteranceId) {
+                val listener = onCompletionListener
+                onCompletionListener = null
+                currentUtteranceId = null
+                listener?.invoke()
+            }
+        }
+    }
+
 
     fun setLanguage(isVietnamese: Boolean) {
         lastIsVietnamese = isVietnamese
@@ -128,7 +128,9 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
             return
         }
         if (isInitialized) {
+            val utteranceId = "u${++utteranceCounter}"
             this.onCompletionListener = onComplete
+            this.currentUtteranceId = utteranceId
             lastSpokenText = text
             lastIsVietnamese = isVietnamese
             setLanguage(isVietnamese)
@@ -137,7 +139,7 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
             
             val params = Bundle()
             try {
-                params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "id")
+                params.putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId)
                 params.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, android.media.AudioManager.STREAM_MUSIC)
                 params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1.0f)
             } catch (e: Exception) {
@@ -145,7 +147,7 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
             }
             
             try {
-                val result = tts?.speak(text, queueMode, params, "id")
+                val result = tts?.speak(text, queueMode, params, utteranceId)
                 if (result == TextToSpeech.ERROR) {
                     Log.e("TTSManager", "speak call returned TextToSpeech.ERROR")
                     mainHandler.post {
