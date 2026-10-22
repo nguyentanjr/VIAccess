@@ -14,7 +14,7 @@ object DarknessDetector {
         return sum.toDouble() / data.size
     }
 
-    fun isDark(image: ImageProxy, threshold: Double = 40.0): Boolean {
+    fun isDark(image: ImageProxy, threshold: Double = FeedbackConfig.DARK_LUMINANCE_ON): Boolean {
         return calculateLuminance(image) < threshold
     }
 }

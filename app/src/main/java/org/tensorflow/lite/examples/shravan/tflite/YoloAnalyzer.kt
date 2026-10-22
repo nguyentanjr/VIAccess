@@ -8,6 +8,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import org.tensorflow.lite.examples.shravan.utils.FeedbackConfig
 import org.tensorflow.lite.examples.shravan.utils.ImageUtils
 import org.tensorflow.lite.examples.shravan.utils.SettingsManager
 import org.tensorflow.lite.examples.shravan.utils.TTSManager
@@ -75,7 +76,7 @@ class YoloAnalyzer(
     // Persistence state
     private var persistentRecognitions = mutableListOf<Classifier.Recognition>()
     private val frameCountMap = mutableMapOf<String, Int>()
-    private val PERSISTENCE_THRESHOLD = 5 // Stay detected for 5 frames if missing
+    private val PERSISTENCE_THRESHOLD = FeedbackConfig.YOLO_PERSISTENCE_FRAMES
     private var frameCounter = 0
 
     override fun analyze(image: ImageProxy) {
@@ -85,7 +86,7 @@ class YoloAnalyzer(
                 return
             }
             frameCounter++
-            if (frameCounter % 5 != 0) {
+            if (frameCounter % FeedbackConfig.YOLO_FRAME_SKIP != 0) {
                 image.close()
                 return
             }
@@ -106,13 +107,13 @@ class YoloAnalyzer(
                 )
 
                 val results = detector.recognizeImage(scaledBitmap)
-                val baseFiltered = results.filter { it.confidence > 0.25f }
+                val baseFiltered = results.filter { it.confidence > FeedbackConfig.YOLO_MIN_CONFIDENCE }
                 
                 // Totally Blind Optimization: dynamic debounce
                 val currentDebounce = if (settingsManager.impairmentLevel == org.tensorflow.lite.examples.shravan.utils.ImpairmentLevel.TotallyImpaired) {
-                    1000L // Faster announcements for totally blind
+                    FeedbackConfig.YOLO_DEBOUNCE_TOTALLY_BLIND_MS
                 } else {
-                    2000L
+                    FeedbackConfig.YOLO_DEBOUNCE_PARTIAL_MS
                 }
 
                 val currentLabelsList = labels
@@ -163,7 +164,7 @@ class YoloAnalyzer(
                 }
 
                 // Clean up old entries to prevent memory leak
-                lastSeenTime.entries.removeIf { currentTime - it.value > 5000L }
+                lastSeenTime.entries.removeIf { currentTime - it.value > FeedbackConfig.YOLO_SEEN_CACHE_MS }
 
                 onResults?.invoke(persistentRecognitions)
             } catch (e: Exception) {

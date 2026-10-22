@@ -181,7 +181,7 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
         if (currentlySpeaking) return true
         
         val timeSinceLastSpeech = System.currentTimeMillis() - lastSpeechEndTime
-        return timeSinceLastSpeech < 500 // 500ms buffer to prevent voice command interference
+        return timeSinceLastSpeech < FeedbackConfig.TTS_TAIL_BUFFER_MS
     }
 
     fun stop() {

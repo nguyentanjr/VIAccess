@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import org.tensorflow.lite.examples.shravan.utils.DarknessDetector
+import org.tensorflow.lite.examples.shravan.utils.FeedbackConfig
 import org.tensorflow.lite.examples.shravan.utils.SettingsManager
 
 class CompositeAnalyzer(
@@ -24,9 +25,9 @@ class CompositeAnalyzer(
                 // If torch is OFF: turn ON if luminance < 40
                 // If torch is ON: turn OFF only if luminance > 120 (it sees its own light)
                 val isDark = if (!isTorchCurrentlyOn) {
-                    luminance < 40.0
+                    luminance < FeedbackConfig.DARK_LUMINANCE_ON
                 } else {
-                    luminance < 120.0 
+                    luminance < FeedbackConfig.DARK_LUMINANCE_OFF 
                 }
                 
                 if (isDark != isTorchCurrentlyOn) {

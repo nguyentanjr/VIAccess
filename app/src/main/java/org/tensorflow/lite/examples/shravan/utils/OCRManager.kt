@@ -5,10 +5,10 @@ import java.util.LinkedList
 
 class OCRManager(context: Context) {
     private val spokenTextTimes = mutableMapOf<String, Long>()
-    private val DEBOUNCE_MS = 10000L // 10 seconds
+    private val DEBOUNCE_MS = FeedbackConfig.OCR_REPEAT_COOLDOWN_MS
     
     private val historyBuffer = LinkedList<String>()
-    private val BUFFER_SIZE = 5
+    private val BUFFER_SIZE = FeedbackConfig.OCR_STABLE_BUFFER
 
     private fun levenshtein(lhs: CharSequence, rhs: CharSequence): Int {
         val len0 = lhs.length + 1
@@ -34,7 +34,7 @@ class OCRManager(context: Context) {
 
     fun shouldSpeak(text: String): Boolean {
         val normalized = text.lowercase().trim()
-        if (normalized.length <= 3) return false
+        if (normalized.length <= FeedbackConfig.OCR_MIN_TEXT_LENGTH) return false
         
         val currentTime = System.currentTimeMillis()
         
@@ -46,7 +46,7 @@ class OCRManager(context: Context) {
             val dist = levenshtein(normalized, spokenText)
             val maxLength = Math.max(normalized.length, spokenText.length)
             // If similarity is > 60%, suppress it (dist <= 40% of length)
-            if (dist <= maxLength * 0.4) {
+            if (dist <= maxLength * FeedbackConfig.OCR_REPEAT_MAX_DIFF) {
                 // Update the timer to keep debouncing while they hold it there
                 spokenTextTimes[spokenText] = currentTime
                 return false
@@ -64,12 +64,12 @@ class OCRManager(context: Context) {
             val dist = levenshtein(normalized, buffered)
             val maxLength = Math.max(normalized.length, buffered.length)
             // 80% similar to count as the "same" word for stability check
-            if (dist <= maxLength * 0.2) { 
+            if (dist <= maxLength * FeedbackConfig.OCR_STABLE_MAX_DIFF) { 
                 matches++
             }
         }
         
-        if (matches >= 3) {
+        if (matches >= FeedbackConfig.OCR_STABLE_MATCHES) {
             spokenTextTimes[normalized] = currentTime
             historyBuffer.clear()
             return true
