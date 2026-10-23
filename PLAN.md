@@ -180,7 +180,7 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 ### 9.1 Tân — luồng chính & tích hợp (20)
 - [x] Copy repo, bỏ dữ liệu / build, sửa `settings.gradle`
 - [ ] `[S]` Gửi cô bản phạm vi đã thu gọn (mục 1, 4, 6) để duyệt
-- [x] `[M]` `git init`, đẩy lên repo nhóm; cả nhóm làm chung nhánh `main`
+- [x] `[M]` `git init`, đẩy lên repo nhóm; mỗi người một nhánh (`tan`, `tien`, `hung`, `hoang`), gộp vào `main` qua Pull Request
 - [x] Xóa `RoboflowAnalyzer.kt` (chứa API key)
 - [x] `[M]` Gỡ Explore / History / Themes khỏi navigation
 - [ ] `[S]` Build + chạy trên máy thật, ghi model máy test *(build OK; chưa thử máy thật)*
