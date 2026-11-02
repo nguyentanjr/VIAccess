@@ -50,6 +50,7 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
     var currentPage by remember { mutableIntStateOf(0) }
+    var pendingFindTarget by remember { mutableStateOf<FindTarget?>(null) }
     val density = LocalDensity.current
     val swipeThreshold = remember { with(density) { 50.dp.toPx() } }
     var totalDrag by remember { mutableStateOf(0f) }
@@ -156,10 +157,23 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
                 if (!handled) {
                     for (entry in navKeywords) {
                         if (trimmedResult.contains(entry.first)) {
-                            if (currentPage != entry.second) {
+                            val requestedTarget =
+                                if (entry.second == PAGE_FIND) {
+                                    FindTarget.fromCommand(trimmedResult)
+                                } else {
+                                    null
+                                }
+                            val targetedFindCommand = requestedTarget != null
+                            if (targetedFindCommand && currentPage != PAGE_FIND) {
+                                pendingFindTarget = requestedTarget
+                                currentPage = PAGE_FIND
+                                handled = true
+                            } else if (targetedFindCommand) {
+                                handled = false
+                            } else if (currentPage != entry.second) {
                                 currentPage = entry.second
+                                handled = true
                             }
-                            handled = true
                             break
                         }
                     }
@@ -279,7 +293,9 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
                             voiceCommandManager = voiceCommandManager,
                             settingsManager = settingsManager,
                             isActive = isActive,
-                            yoloAnalyzer = yoloAnalyzer
+                            yoloAnalyzer = yoloAnalyzer,
+                            initialTarget = pendingFindTarget,
+                            onInitialTargetHandled = { pendingFindTarget = null }
                         )
                         PAGE_OCR -> OCRScreen(
                             onBack = { currentPage = PAGE_FIND },

@@ -58,8 +58,10 @@ object FeedbackConfig {
     const val FIND_LEFT_MAX_X = 0.35f
     const val FIND_RIGHT_MIN_X = 0.65f
     const val FIND_SEARCH_PULSE_MS = 2000L
+    const val FIND_HAPTIC_AREA_SCALE_MS = 750L
     const val HAPTIC_INTERVAL_FAR_MS = 1000L
     const val HAPTIC_INTERVAL_NEAR_MS = 250L
+    const val METRIC_MAX_ROWS = 20_000
 
     // --- Rung ---
     const val HAPTIC_SHORT_MS = 50L

@@ -74,7 +74,16 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
 
     private fun setupProgressListener() {
         tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
-            override fun onStart(utteranceId: String?) {}
+            override fun onStart(utteranceId: String?) {
+                MetricLogger.log(
+                    event = "tts_start",
+                    baselineMode = context.getSharedPreferences(
+                        "shravan_prefs",
+                        Context.MODE_PRIVATE
+                    ).getBoolean("baseline_mode", false),
+                    detail = utteranceId.orEmpty()
+                )
+            }
             override fun onDone(utteranceId: String?) = finish(utteranceId)
             override fun onError(utteranceId: String?) {
                 Log.e("TTSManager", "Utterance error: $utteranceId")

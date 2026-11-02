@@ -35,6 +35,11 @@ class HapticManager(private val context: Context, private val settingsManager: S
         if (!settingsManager.hapticsEnabled) return
         val v = vibrator ?: return
         try {
+            MetricLogger.log(
+                event = "haptic_start",
+                baselineMode = settingsManager.baselineMode,
+                detail = pattern.name
+            )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val effect = when (pattern) {
                     HapticPattern.SHORT -> VibrationEffect.createOneShot(FeedbackConfig.HAPTIC_SHORT_MS, VibrationEffect.DEFAULT_AMPLITUDE)

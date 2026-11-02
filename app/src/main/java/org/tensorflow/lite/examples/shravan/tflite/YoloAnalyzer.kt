@@ -4,12 +4,14 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.os.Build
+import android.os.SystemClock
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import org.tensorflow.lite.examples.shravan.utils.FeedbackConfig
 import org.tensorflow.lite.examples.shravan.utils.FeedbackCoordinator
+import org.tensorflow.lite.examples.shravan.utils.MetricLogger
 import org.tensorflow.lite.examples.shravan.utils.Priority
 import org.tensorflow.lite.examples.shravan.utils.ImageUtils
 import org.tensorflow.lite.examples.shravan.utils.SettingsManager
@@ -26,6 +28,10 @@ class YoloAnalyzer(
 ) : ImageAnalysis.Analyzer {
 
     var allowedClasses: List<String>? = null
+    var announcementsEnabled: Boolean = false
+    var inputSize: Int = 0
+        private set
+    var onFrameResults: ((Long, List<Classifier.Recognition>) -> Unit)? = null
 
     private var currentDetector: YoloV5Classifier? = null
     private var currentLabels: List<String>? = null
@@ -91,8 +97,16 @@ class YoloAnalyzer(
                 image.close()
                 return
             }
+            val frameStartedAtNs = SystemClock.elapsedRealtimeNanos()
+            val frameId = frameCounter.toLong()
+            MetricLogger.log(
+                event = "frame_start",
+                frameId = frameId,
+                baselineMode = settingsManager.baselineMode
+            )
             try {
                 val detector = getDetector()
+                inputSize = detector.inputSize
                 val bitmap = ImageUtils.toBitmap(image)
                 if (bitmap == null) {
                     return
@@ -107,7 +121,15 @@ class YoloAnalyzer(
                     rotatedBitmap, detector.inputSize, detector.inputSize, true
                 )
 
+                val inferenceStartedAtNs = SystemClock.elapsedRealtimeNanos()
                 val results = detector.recognizeImage(scaledBitmap)
+                val inferenceFinishedAtNs = SystemClock.elapsedRealtimeNanos()
+                MetricLogger.log(
+                    event = "inference_complete",
+                    frameId = frameId,
+                    latencyMs = (inferenceFinishedAtNs - inferenceStartedAtNs) / 1_000_000L,
+                    baselineMode = settingsManager.baselineMode
+                )
                 val baseFiltered = results.filter { it.confidence > FeedbackConfig.YOLO_MIN_CONFIDENCE }
                 
                 // Totally Blind Optimization: dynamic debounce
@@ -125,6 +147,27 @@ class YoloAnalyzer(
                     }
                 } else {
                     baseFiltered
+                }
+                if (currentFiltered.isEmpty()) {
+                    MetricLogger.log(
+                        event = "detection_empty",
+                        frameId = frameId,
+                        latencyMs = (SystemClock.elapsedRealtimeNanos() - frameStartedAtNs) /
+                            1_000_000L,
+                        baselineMode = settingsManager.baselineMode
+                    )
+                } else {
+                    currentFiltered.forEach { recognition ->
+                        MetricLogger.log(
+                            event = "detection",
+                            frameId = frameId,
+                            classId = recognition.detectedClass,
+                            confidence = recognition.confidence,
+                            latencyMs = (SystemClock.elapsedRealtimeNanos() - frameStartedAtNs) /
+                                1_000_000L,
+                            baselineMode = settingsManager.baselineMode
+                        )
+                    }
                 }
 
                 // Apply Persistence Logic
@@ -150,25 +193,38 @@ class YoloAnalyzer(
                 
                 persistentRecognitions = newPersistentList
 
-                val currentTime = System.currentTimeMillis()
-                persistentRecognitions.forEach { result ->
-                    val detectedClass = result.detectedClass
-                    val title = if (detectedClass < currentLabelsList.size) currentLabelsList[detectedClass] else result.title
-                    
-                    val announcement = title
+                if (announcementsEnabled) {
+                    val currentTime = System.currentTimeMillis()
+                    persistentRecognitions.forEach { result ->
+                        val detectedClass = result.detectedClass
+                        val title = if (detectedClass < currentLabelsList.size) {
+                            currentLabelsList[detectedClass]
+                        } else {
+                            result.title
+                        }
 
-                    val lastSeen = lastSeenTime[announcement] ?: 0L
-                    if (currentTime - lastSeen > currentDebounce) {
-                        feedback.say(announcement, Priority.INFO, key = "object:$announcement")
+                        val lastSeen = lastSeenTime[title] ?: 0L
+                        if (currentTime - lastSeen > currentDebounce) {
+                            feedback.say(title, Priority.INFO, key = "object:$title")
+                        }
+                        lastSeenTime[title] = currentTime
                     }
-                    lastSeenTime[announcement] = currentTime
+
+                    // Clean up old entries to prevent memory leak
+                    lastSeenTime.entries.removeIf {
+                        currentTime - it.value > FeedbackConfig.YOLO_SEEN_CACHE_MS
+                    }
                 }
 
-                // Clean up old entries to prevent memory leak
-                lastSeenTime.entries.removeIf { currentTime - it.value > FeedbackConfig.YOLO_SEEN_CACHE_MS }
-
-                onResults?.invoke(persistentRecognitions)
+                onResults?.invoke(currentFiltered)
+                onFrameResults?.invoke(frameId, currentFiltered)
             } catch (e: Exception) {
+                MetricLogger.log(
+                    event = "inference_error",
+                    frameId = frameId,
+                    baselineMode = settingsManager.baselineMode,
+                    detail = e.javaClass.simpleName
+                )
                 e.printStackTrace()
             } finally {
                 image.close()
