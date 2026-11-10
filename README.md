@@ -1,84 +1,42 @@
-# VisionAid: Visually Impaired Assistance Application
+# VIAccess
 
-VisionAid (Internal Code Name: **Shravan**) is an advanced Android application designed to empower individuals with visual impairments. Built with a "Human-Computer Interaction (HCI) First" philosophy, it provides independent access to text and object recognition through a seamless, audio-centric interface.
+Ứng dụng Android giúp người khiếm thị **đọc văn bản** và **tìm đồ vật quen thuộc** bằng camera điện thoại, phản hồi bằng giọng nói và rung, không cần nhìn màn hình.
 
-## 🌟 Overview
+Đồ án môn Tương tác người máy (INT2041), Nhóm 13, Trường Đại học Công nghệ – ĐHQGHN.
+Kế thừa từ repo VisionAid (Nhóm 2, INT2041 2025–2026); phần nhóm tự phát triển xem `PLAN.md` mục 1.4.
 
-VisionAid addresses the critical need for independent information access. Whether it's reading a medication label, finding a misplaced chair, or exploring a new environment, VisionAid transforms visual data into actionable audio and haptic feedback.
+## Tính năng
+- **Đọc văn bản:** app nhắc căn camera (ánh sáng yếu, giữ yên máy, ảnh mờ, đưa máy ra xa, lệch trái / phải, lại gần). Khi chữ rõ và ổn định, máy rung ngắn rồi tự đọc.
+- **Tìm vật:** chọn một trong 6 vật (cốc, chai, điện thoại, điều khiển, sách, ghế). Máy rung nhanh dần khi lại gần và nói hướng trái / giữa / phải.
+- **Lệnh giọng nói:** "đọc chữ", "tìm" + tên vật, "dừng", "tiếp", "đọc lại", "quay lại". Mỗi lệnh đều có nút chạm tương ứng ở cuối màn hình.
+- Mọi xử lý nhận diện chạy trên máy, không gửi ảnh đi đâu.
 
-Unlike traditional solutions, VisionAid is designed for **Screen-Independent Usage**, catering to two primary user groups:
-- **Totally Blind Users:** Audio-first interaction, voice commands, and haptic (vibration) feedback.
-- **Partially Sighted Users:** High-contrast interfaces, large typography, and assistive visuals.
+## Cài đặt
+Yêu cầu: Android 7.0 (API 24) trở lên; để build cần Android Studio (JDK 21 đi kèm).
 
-## ✨ Key Features
+```bash
+git clone https://github.com/nguyentanjr/VIAccess.git
+cd VIAccess
+./gradlew assembleDebug        # tạo app/build/outputs/apk/debug/app-debug.apk
+./gradlew installDebug         # cài lên máy đang cắm USB (bật gỡ lỗi USB)
+./gradlew test                 # chạy unit test
+```
 
-### 🔍 Vision & AI
-- **Explore Mode:** Real-time object detection using YOLOv5, announcing surroundings via Text-to-Speech (TTS).
-- **Find Mode:** Targeted object searching. Features **Haptic Pulse Guidance**—the phone's vibration frequency increases as the target object moves closer to the center of the frame.
-- **Advanced OCR (Vietnamese & English):** Offline text recognition with:
-  - **Auto-Capture:** Automatically triggers when the camera detects stable, clear text.
-  - **Quality Guard:** Voice warnings for blur, low light, or camera shake.
-  - **Reading Flow Control:** Navigate through long texts using gestures (Swipe right for next sentence, left for previous, two-finger tap to pause/resume).
+Trên máy cần:
+- Cho phép **camera** và **micro** khi app hỏi.
+- Có **giọng đọc tiếng Việt** trong Cài đặt → Chuyển văn bản thành giọng nói (Google TTS → tải "Tiếng Việt"). Nếu thiếu, app sẽ hiện hộp thoại hướng dẫn cài.
+- Nhận lệnh giọng nói dùng dịch vụ nhận dạng của máy; có thể cần mạng. Khi mất mạng, app báo và bạn dùng nút chạm.
 
-### 🎙️ Accessibility & Control
-- **Global Voice Commands:** Control the app entirely by voice ("Explore", "Find", "OCR", "Settings", "Back").
-- **Voice Onboarding:** A guided audio tutorial for first-time users to learn gestures and commands.
-- **Haptic Feedback:** Spatial orientation through vibration patterns.
-- **Offline First:** All AI processing (YOLO, OCR, TTS) happens on-device to ensure privacy and low latency.
+## Sử dụng
+1. Lần đầu mở app: làm theo hướng dẫn bằng giọng nói và cấp quyền.
+2. Nói **"đọc chữ"** (hoặc chạm nút Đọc chữ), đưa camera về phía văn bản và làm theo lời nhắc. Nói **"dừng"** / **"tiếp"** / **"đọc lại"** khi đang nghe.
+3. Nói **"tìm cốc"** (hoặc chạm nút Tìm rồi chọn vật), xoay máy chậm; nghe "Đã thấy cốc, bên trái" và đi theo rung.
+4. Nói **"quay lại"** hoặc bấm nút Back để về màn chính; **"giúp đỡ"** để nghe danh sách lệnh.
 
-## 🛠️ Tech Stack
+## Cấu trúc chính
+- `utils/FeedbackCoordinator.kt` – điều phối lời nói / rung chống quá tải
+- `utils/FeedbackConfig.kt` – toàn bộ ngưỡng có thể hiệu chỉnh
+- `utils/ImageQuality.kt`, `utils/MotionMonitor.kt`, `utils/AlignmentAdvisor.kt` – luật căn camera cho OCR
+- `ui/screens/OCRScreen.kt`, `ui/screens/FindScreen.kt`, `ui/screens/MainScreen.kt`
 
-- **Language:** Kotlin
-- **UI Framework:** Jetpack Compose (Modern, accessible, and high-contrast)
-- **Camera:** Android CameraX
-- **Machine Learning:** 
-  - **TensorFlow Lite:** YOLOv5s for real-time object detection.
-  - **ML Kit:** For high-accuracy offline OCR.
-- **Speech:** Android Text-to-Speech (TTS) & Speech Recognizer.
-- **Architecture:** Hybrid MVVM/MVI for robust state management.
-
-## 🏗️ Architecture
-
-The system is organized into three main layers:
-1.  **UI Layer:** Jetpack Compose screens and ViewModels.
-2.  **Domain Layer:** Specialized Managers (SettingsManager, HistoryManager, VoiceCommandManager).
-3.  **Data Layer:** Image Analyzers (YoloAnalyzer, OCRManager) and CameraX integration.
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Android device running Android 7.0 (API 24) or higher.
-- Android Studio Ladybug or newer.
-
-### Installation
-1. Clone the repository:
-   ```shell
-   git clone https://github.com/ssharmapavitra/Shravan.git
-   ```
-2. Open in Android Studio.
-3. Sync Gradle and build the project.
-
-## 📖 Usage
-
-1.  **Setup & Onboarding:** On first launch, VisionAid will guide you through an audio-onboarding process.
-2.  **Navigation:** Use the bottom navigation bar or simply say a command like **"OCR"** or **"Find"**.
-3.  **Text Reading:** Point the camera at any text. The app will notify you if the lighting is too low or if the image is blurry. Once stable, it will read the text automatically.
-4.  **Object Search:** Say **"Find [Object Name]"**. Move your phone around; the vibration will guide you toward the target.
-
-## 📊 Research & Performance
-
-VisionAid was evaluated with 8 participants (4 totally blind, 4 partially sighted):
-- **Task Completion Rate:** 93.75%
-- **System Usability Scale (SUS):** 89.4 (Excellent)
-- **NASA-TLX (Cognitive Load):** 25.4 (Low)
-
-## 🤝 Contributing
-
-We welcome contributions to enhance accessibility. Please feel free to open issues or submit pull requests.
-
-## 📜 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-*Developed as part of the Human-Computer Interaction (INT2041) course at VNU University of Engineering and Technology (UET).*
+Spec, phân công và tiến độ: `PLAN.md`.

@@ -40,8 +40,29 @@ fun OCRScreen(
     var isProcessing by remember { mutableStateOf(false) }
     var currentText by remember { mutableStateOf("") }
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val motionMonitor = remember { MotionMonitor(context) }
+    val advisor = remember { AlignmentAdvisor() }
+    val adviceText = mapOf(
+        AlignmentAdvice.DARK to stringResource(R.string.align_dark),
+        AlignmentAdvice.SHAKY to stringResource(R.string.align_shaky),
+        AlignmentAdvice.BLURRY to stringResource(R.string.align_blurry),
+        AlignmentAdvice.TOO_CLOSE to stringResource(R.string.align_too_close),
+        AlignmentAdvice.OFF_LEFT to stringResource(R.string.align_off_left),
+        AlignmentAdvice.OFF_RIGHT to stringResource(R.string.align_off_right),
+        AlignmentAdvice.TOO_SMALL to stringResource(R.string.align_too_small),
+        AlignmentAdvice.NO_TEXT to stringResource(R.string.align_no_text)
+    )
+
+    // Gyroscope chỉ chạy khi màn Đọc chữ đang mở.
+    DisposableEffect(isActive) {
+        if (isActive) motionMonitor.start()
+        onDispose { motionMonitor.stop() }
+    }
+
     LaunchedEffect(isActive, recognizer) {
         if (isActive) {
+            advisor.reset()
             onProvideAnalyzer { imageProxy ->
                 if (isProcessing) {
                     imageProxy.close()
@@ -52,15 +73,59 @@ fun OCRScreen(
                 val rec = recognizer
                 if (mediaImage != null && rec != null) {
                     isProcessing = true
-                    val inputImage = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+                    val rotation = imageProxy.imageInfo.rotationDegrees
+                    // Đo chất lượng trên kênh Y trước khi ML Kit đọc ảnh.
+                    val gray = ImageQuality.sampleLuma(imageProxy)
+                    val luminance = ImageQuality.meanLuminance(gray)
+                    val sharpness = ImageQuality.laplacianVariance(gray)
+                    val shaking = motionMonitor.isShaking()
+                    val (uprightW, uprightH) = if (rotation % 180 == 0) {
+                        imageProxy.width to imageProxy.height
+                    } else {
+                        imageProxy.height to imageProxy.width
+                    }
+                    val inputImage = InputImage.fromMediaImage(mediaImage, rotation)
                     rec.process(inputImage)
                         .addOnSuccessListener { visionText ->
                             val text = visionText.text
-                            if (text.isNotBlank()) {
-                                currentText = text
-                                // Automatic reading logic
-                                if (ocrManager?.shouldSpeak(text) == true) {
+                            if (text.isNotBlank()) currentText = text
+
+                            if (settingsManager.baselineMode) {
+                                // Baseline (VisionAid): không nhắc căn chỉnh, đọc liên tục khi chữ ổn định.
+                                if (text.isNotBlank() && ocrManager?.shouldSpeak(text) == true) {
                                     feedback.say(text, Priority.STATE, key = "ocr:auto", isVietnamese = containsVietnamese(text))
+                                }
+                                return@addOnSuccessListener
+                            }
+
+                            val box = ImageQuality.unionBox(
+                                visionText.textBlocks.mapNotNull { block ->
+                                    block.boundingBox?.let { intArrayOf(it.left, it.top, it.right, it.bottom) }
+                                },
+                                uprightW,
+                                uprightH
+                            )
+                            val advice = advisor.evaluate(
+                                FrameQuality(
+                                    luminance = luminance,
+                                    flashUnavailable = settingsManager.flashMode == "off",
+                                    shaking = shaking,
+                                    laplacianVariance = sharpness,
+                                    textBox = if (text.isBlank()) null else box
+                                ),
+                                android.os.SystemClock.elapsedRealtime()
+                            )
+                            when (advice) {
+                                AlignmentAdvice.NONE -> Unit
+                                AlignmentAdvice.OK -> {
+                                    // Tự chụp: đạt hết điều kiện + chữ ổn định 3/5 frame (OCRManager) → rung ngắn → đọc.
+                                    if (ocrManager?.shouldSpeak(text) == true) {
+                                        feedback.vibrate(HapticPattern.SHORT, force = true)
+                                        feedback.say(text, Priority.STATE, key = "ocr:auto", isVietnamese = containsVietnamese(text))
+                                    }
+                                }
+                                else -> adviceText[advice]?.let {
+                                    feedback.say(it, Priority.GUIDANCE, key = "align:$advice")
                                 }
                             }
                         }

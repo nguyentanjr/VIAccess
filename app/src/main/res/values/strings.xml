@@ -44,4 +44,12 @@
     <string name="status_location">You are currently in %s</string>
     <string name="tutorial_text">Welcome to the tutorial. This app has 5 main screens: Explore to detect objects around you, Find to locate specific items, OCR to read text, Settings to configure preferences, and History to view past detections. You can swipe left and right, or say the screen name to navigate. Click the screen to end this tutorial and grant necessary permissions.</string>
     <string name="tutorial_skip_instruction">Playing tutorial...\nClick screen to continue.</string>
-</resources>
+    <!-- Camera alignment for OCR (PLAN 4.2) -->
+    <string name="align_dark">Low light</string>
+    <string name="align_shaky">Hold the phone still</string>
+    <string name="align_blurry">Image is blurry, hold still</string>
+    <string name="align_too_close">Move the phone back</string>
+    <string name="align_off_left">Text is to the left</string>
+    <string name="align_off_right">Text is to the right</string>
+    <string name="align_too_small">Move closer</string>
+    <string name="align_no_text">No text yet</string></resources>

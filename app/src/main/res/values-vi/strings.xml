@@ -44,4 +44,12 @@
     <string name="status_location">Bạn đang ở %s</string>
     <string name="tutorial_text">Chào mừng bạn đến với hướng dẫn. Ứng dụng này có 5 màn hình chính: Khám phá để nhận diện vật thể xung quanh, Tìm kiếm để tìm vật thể cụ thể, Đọc văn bản để đọc chữ, Cài đặt để tùy chỉnh, và Lịch sử để xem lại. Bạn có thể vuốt trái phải, hoặc đọc tên màn hình để chuyển. Nhấn vào màn hình để kết thúc và cấp quyền.</string>
     <string name="tutorial_skip_instruction">Đang phát hướng dẫn...\nNhấn vào màn hình để chuyển tiếp.</string>
-</resources>
+    <!-- Căn camera cho OCR (PLAN 4.2) -->
+    <string name="align_dark">Ánh sáng yếu</string>
+    <string name="align_shaky">Giữ yên máy</string>
+    <string name="align_blurry">Ảnh mờ, giữ yên</string>
+    <string name="align_too_close">Đưa máy ra xa</string>
+    <string name="align_off_left">Lệch trái</string>
+    <string name="align_off_right">Lệch phải</string>
+    <string name="align_too_small">Lại gần</string>
+    <string name="align_no_text">Chưa thấy chữ</string></resources>

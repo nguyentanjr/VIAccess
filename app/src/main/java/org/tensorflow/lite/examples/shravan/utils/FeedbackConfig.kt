@@ -31,6 +31,8 @@ object FeedbackConfig {
     const val TEXT_MIN_AREA = 0.10f
     const val NO_TEXT_FIRST_PROMPT_MS = 5000L
     const val NO_TEXT_REPEAT_MS = 10_000L
+    /** Lấy mẫu mỗi N điểm ảnh khi đo độ sáng / độ nét (ngưỡng Laplacian phụ thuộc giá trị này). */
+    const val QUALITY_SAMPLE_STEP = 4
 
     // --- Ổn định OCR (kế thừa OCRManager) ---
     const val OCR_MIN_TEXT_LENGTH = 3
