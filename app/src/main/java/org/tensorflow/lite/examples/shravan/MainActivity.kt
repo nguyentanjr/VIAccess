@@ -32,11 +32,21 @@ class MainActivity : ComponentActivity() {
     private var ttsManagerInstance: TTSManager? = null
     private var feedbackInstance: FeedbackCoordinator? = null
 
+    private var voiceInstance: VoiceCommandManager? = null
+
     override fun onPause() {
         super.onPause()
-        // Dừng cả hàng đợi của Coordinator, nếu không lời kế tiếp sẽ phát khi app đang ở nền.
-        feedbackInstance?.stopSpeech()
+        // App chạy nền: dừng lời nói + hàng đợi, chặn rung mới, ngừng nghe mic.
+        // Camera tự dừng vì CameraX gắn với lifecycle của Activity.
+        feedbackInstance?.setSuspended(true)
         ttsManagerInstance?.stopAll()
+        voiceInstance?.suspend()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        feedbackInstance?.setSuspended(false)
+        voiceInstance?.resume()
     }
 
     override fun onDestroy() {
@@ -81,7 +91,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 val voiceCommandManager = remember { 
-                    try { VoiceCommandManager(context) } catch (e: Throwable) { 
+                    try { VoiceCommandManager(context).also { voiceInstance = it } } catch (e: Throwable) {
                         android.util.Log.e("MainActivity", "VoiceCommandManager init failed", e)
                         null 
                     }
@@ -160,6 +170,66 @@ CompositionLocalProvider(LocalConfiguration provides overriddenConfiguration) {
                             }
                         )
 
+                        var permissionAsked by remember { mutableStateOf(false) }
+
+                        // Quay lại từ màn cài đặt hệ thống: đọc lại quyền.
+                        val lifecycleOwner = androidx.compose.ui.platform.LocalLifecycleOwner.current
+                        DisposableEffect(lifecycleOwner) {
+                            val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+                                if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) {
+                                    hasCameraPermission = ContextCompat.checkSelfPermission(
+                                        context, Manifest.permission.CAMERA
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                    hasRecordAudioPermission = ContextCompat.checkSelfPermission(
+                                        context, Manifest.permission.RECORD_AUDIO
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                }
+                            }
+                            lifecycleOwner.lifecycle.addObserver(observer)
+                            onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+                        }
+
+                        // Lỗi TTS: không khởi động được, hoặc thiếu giọng tiếng Việt.
+                        var showMissingVoice by remember { mutableStateOf(false) }
+                        DisposableEffect(ttsManager) {
+                            ttsManager.onVietnameseVoiceMissing = {
+                                showMissingVoice = true
+                                feedback.vibrate(HapticPattern.DOUBLE, force = true)
+                            }
+                            ttsManager.onInitFailed = {
+                                feedback.vibrate(HapticPattern.DOUBLE, force = true)
+                                android.widget.Toast.makeText(
+                                    context, context.getString(R.string.error_tts_init),
+                                    android.widget.Toast.LENGTH_LONG
+                                ).show()
+                            }
+                            onDispose {
+                                ttsManager.onVietnameseVoiceMissing = null
+                                ttsManager.onInitFailed = null
+                            }
+                        }
+                        if (showMissingVoice) {
+                            MissingVoiceDialog(
+                                onInstall = {
+                                    showMissingVoice = false
+                                    try {
+                                        context.startActivity(
+                                            android.content.Intent(android.speech.tts.TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA)
+                                                .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                                        )
+                                    } catch (e: Exception) {
+                                        runCatching {
+                                            context.startActivity(
+                                                android.content.Intent("com.android.settings.TTS_SETTINGS")
+                                                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                                            )
+                                        }
+                                    }
+                                },
+                                onDismiss = { showMissingVoice = false }
+                            )
+                        }
+
                         LaunchedEffect(settingsManager.speechRate) {
                             ttsManager.setSpeechRate(settingsManager.speechRate)
                         }
@@ -223,10 +293,17 @@ CompositionLocalProvider(LocalConfiguration provides overriddenConfiguration) {
                                         }
                                     )
                                 } else {
-                                    // Show loading or permission request state if still missing
-                                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                                        CircularProgressIndicator()
-                                    }
+                                    // Thiếu quyền: nói ra lý do + một nút lớn để cấp quyền (hoặc mở cài đặt nếu đã bị chặn).
+                                    PermissionRequiredScreen(
+                                        feedback = feedback,
+                                        askedBefore = permissionAsked,
+                                        onRequest = {
+                                            permissionAsked = true
+                                            launcher.launch(
+                                                arrayOf(Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO)
+                                            )
+                                        }
+                                    )
                                 }
                             }
                         }

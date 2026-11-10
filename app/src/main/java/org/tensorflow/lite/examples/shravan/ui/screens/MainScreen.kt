@@ -13,7 +13,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.*
@@ -37,6 +43,13 @@ import org.tensorflow.lite.examples.shravan.utils.*
 private const val PAGE_FIND = 0
 private const val PAGE_OCR = 1
 private const val PAGE_SETTINGS = 2
+
+private data class BarItem(
+    val label: Int,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+    val selected: Boolean,
+    val onClick: () -> Unit
+)
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
@@ -107,22 +120,107 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
         Triple(R.string.nav_settings, Icons.Default.Settings, "settings")
     )
 
-    val kFind = stringResource(R.string.voice_keyword_find).lowercase()
-    val kOcr = stringResource(R.string.voice_keyword_ocr).lowercase()
-    val kSettings = stringResource(R.string.voice_keyword_settings).lowercase()
+    val helpFormat = stringResource(R.string.voice_help_commands)
+    val sNotUnderstood = stringResource(R.string.voice_not_understood)
+    val sUseTouch = stringResource(R.string.voice_use_touch)
+    val sPaused = stringResource(R.string.voice_paused)
+    val sNothingPaused = stringResource(R.string.voice_nothing_paused)
+    val sNothingToRepeat = stringResource(R.string.voice_nothing_to_repeat)
+    val sAlreadyHome = stringResource(R.string.voice_already_home)
+    val sNetwork = stringResource(R.string.error_network)
+    val sVoiceUnavailable = stringResource(R.string.error_voice_unavailable)
+    val sMicPermission = stringResource(R.string.error_mic_permission)
+    val sModelError = stringResource(R.string.error_model)
 
-    val navKeywords = remember(kFind, kOcr, kSettings) {
-        listOf(
-            kFind to PAGE_FIND,
-            kOcr to PAGE_OCR,
-            kSettings to PAGE_SETTINGS
-        )
+    val failureCounter = remember { VoiceFailureCounter() }
+    var lastCommand by remember { mutableStateOf(VoiceCommand.UNKNOWN to 0L) }
+    var hasPaused by remember { mutableStateOf(false) }
+
+    // --- 5 lệnh (PLAN 4.4): dùng chung cho giọng nói và nút chạm ---
+    fun pauseOrResume() {
+        if (feedback.hasPausedSpeech()) {
+            if (!feedback.resumeSpeech()) feedback.say(sNothingPaused, Priority.STATE, userInitiated = true)
+        } else if (feedback.pauseSpeech()) {
+            feedback.vibrate(HapticPattern.SHORT, force = true)
+        } else {
+            feedback.say(sNothingPaused, Priority.STATE, userInitiated = true)
+        }
+        hasPaused = feedback.hasPausedSpeech()
     }
 
-    val kHelp = stringResource(R.string.voice_keyword_help).lowercase()
-    val kWhereAmI = stringResource(R.string.voice_keyword_where_am_i).lowercase()
+    fun repeatLast() {
+        if (!feedback.repeatLast()) feedback.say(sNothingToRepeat, Priority.STATE, userInitiated = true)
+        hasPaused = false
+    }
 
-    val locationFormat = stringResource(R.string.status_location)
+    /** @return true nếu lệnh đã xử lý ở đây; false để màn hình con xử lý tiếp (vd "tìm cốc", "đọc"). */
+    fun handleCommand(command: VoiceCommand): Boolean = when (command) {
+        VoiceCommand.READ_TEXT ->
+            if (currentPage == PAGE_OCR) false else { currentPage = PAGE_OCR; true }
+        VoiceCommand.FIND ->
+            if (currentPage == PAGE_FIND) false else { currentPage = PAGE_FIND; true }
+        VoiceCommand.SETTINGS -> { currentPage = PAGE_SETTINGS; true }
+        VoiceCommand.BACK -> {
+            if (currentPage == PAGE_FIND) {
+                feedback.say(sAlreadyHome, Priority.STATE, userInitiated = true)
+            } else {
+                feedback.stopSpeech()
+                currentPage = PAGE_FIND
+            }
+            true
+        }
+        VoiceCommand.PAUSE -> {
+            if (feedback.pauseSpeech()) {
+                feedback.vibrate(HapticPattern.SHORT, force = true)
+            } else {
+                feedback.say(sPaused, Priority.STATE, userInitiated = true)
+            }
+            hasPaused = feedback.hasPausedSpeech()
+            true
+        }
+        VoiceCommand.RESUME -> {
+            if (!feedback.resumeSpeech()) feedback.say(sNothingPaused, Priority.STATE, userInitiated = true)
+            hasPaused = false
+            true
+        }
+        VoiceCommand.REPEAT -> { repeatLast(); true }
+        VoiceCommand.HELP -> {
+            val currentScreenName = context.getString(screens[currentPage].first)
+            feedback.say(String.format(helpFormat, currentScreenName), Priority.STATE, userInitiated = true)
+            feedback.vibrate(force = true)
+            true
+        }
+        VoiceCommand.UNKNOWN -> false
+    }
+
+    // --- Lỗi: mạng / micro / nhận giọng nói / mô hình → nói ra (ALERT) ---
+    var lastNetworkAlertAt by remember { mutableStateOf(0L) }
+    DisposableEffect(Unit) {
+        voiceCommandManager.onVoiceError = { error ->
+            when (error) {
+                VoiceError.NETWORK -> {
+                    val now = System.currentTimeMillis()
+                    if (now - lastNetworkAlertAt > FeedbackConfig.VOICE_NETWORK_ALERT_COOLDOWN_MS) {
+                        lastNetworkAlertAt = now
+                        feedback.say(sNetwork, Priority.ALERT, key = "error:network")
+                        feedback.vibrate(HapticPattern.DOUBLE, force = true)
+                    }
+                }
+                VoiceError.PERMISSION -> feedback.say(sMicPermission, Priority.ALERT, key = "error:mic")
+                VoiceError.UNAVAILABLE -> feedback.say(sVoiceUnavailable, Priority.ALERT, key = "error:asr")
+            }
+        }
+        yoloAnalyzer.onModelError = {
+            android.os.Handler(android.os.Looper.getMainLooper()).post {
+                feedback.say(sModelError, Priority.ALERT, key = "error:model")
+                feedback.vibrate(HapticPattern.DOUBLE, force = true)
+            }
+        }
+        onDispose {
+            voiceCommandManager.onVoiceError = null
+            yoloAnalyzer.onModelError = null
+        }
+    }
 
     // Single Haptic Trigger
     LaunchedEffect(currentPage) {
@@ -137,34 +235,38 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
     }
 
     // Centralized Voice Navigation Listener
-    DisposableEffect(settingsManager.useVietnamese, navKeywords, screens, currentPage) {
-        voiceCommandManager.onGlobalIntent = { result ->
-            if (ttsManager.isSpeaking()) {
-                false
-            } else {
-                val trimmedResult = result.trim().lowercase()
-                var handled = false
-                
-                // Help / orientation check
-                if (trimmedResult.contains(kHelp) || trimmedResult.contains(kWhereAmI) || trimmedResult.contains("help") || trimmedResult.contains("where am i")) {
-                    val currentScreenName = context.getString(screens[currentPage].first)
-                    feedback.say(String.format(locationFormat, currentScreenName), Priority.STATE, userInitiated = true)
-                    feedback.vibrate(force = true)
-                    handled = true
-                }
-
-                if (!handled) {
-                    for (entry in navKeywords) {
-                        if (trimmedResult.contains(entry.first)) {
-                            if (currentPage != entry.second) {
-                                currentPage = entry.second
-                            }
-                            handled = true
-                            break
+    DisposableEffect(settingsManager.useVietnamese, currentPage) {
+        voiceCommandManager.onGlobalIntent = { result, isFinal ->
+            val command = VoiceCommandParser.parse(result)
+            val now = System.currentTimeMillis()
+            // "dừng" / "đọc lại" phải nghe được cả khi đang đọc; lệnh khác thì chờ TTS xong
+            // để mic không bắt nhầm chính lời app vừa nói.
+            val allowedWhileSpeaking = command == VoiceCommand.PAUSE || command == VoiceCommand.REPEAT
+            val (prevCommand, prevAt) = lastCommand
+            when {
+                command == VoiceCommand.UNKNOWN -> {
+                    // Chỉ đếm lỗi ở kết quả cuối và ở màn Đọc chữ / Cài đặt; màn Tìm tự hiểu tên vật.
+                    if (isFinal && currentPage != PAGE_FIND && !feedback.isBusy()) {
+                        when (failureCounter.onUnrecognized()) {
+                            VoiceFailureCounter.Reaction.ASK_AGAIN ->
+                                feedback.say(sNotUnderstood, Priority.STATE, userInitiated = true)
+                            VoiceFailureCounter.Reaction.SUGGEST_TOUCH ->
+                                feedback.say(sUseTouch, Priority.STATE, userInitiated = true)
                         }
                     }
+                    false
                 }
-                handled
+                feedback.isBusy() && !allowedWhileSpeaking -> false
+                // Kết quả tạm và kết quả cuối của cùng một câu: chỉ xử lý một lần.
+                command == prevCommand && now - prevAt < FeedbackConfig.VOICE_COMMAND_DEDUP_MS -> true
+                else -> {
+                    val handled = handleCommand(command)
+                    if (handled) {
+                        failureCounter.onRecognized()
+                        lastCommand = command to now
+                    }
+                    handled
+                }
             }
         }
         onDispose {
@@ -185,20 +287,44 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
                 containerColor = navBarColor,
                 tonalElevation = 0.dp
             ) {
-                screens.forEachIndexed { index, screen ->
+                // Nút chạm dự phòng cho 5 lệnh giọng nói (PLAN 4.4): Tìm · Đọc chữ · Dừng/Tiếp · Đọc lại · Cài đặt.
+                // "Quay lại" = nút Tìm hoặc nút Back của máy.
+                val itemColors = NavigationBarItemDefaults.colors(
+                    indicatorColor = Color.Transparent,
+                    selectedIconColor = Color.White,
+                    selectedTextColor = Color.White,
+                    unselectedIconColor = Color.LightGray,
+                    unselectedTextColor = Color.LightGray
+                )
+                val barItems = listOf(
+                    BarItem(R.string.nav_find, Icons.Default.Search, currentPage == PAGE_FIND) {
+                        currentPage = PAGE_FIND
+                    },
+                    BarItem(R.string.nav_ocr, Icons.Default.TextFields, currentPage == PAGE_OCR) {
+                        currentPage = PAGE_OCR
+                    },
+                    if (hasPaused) {
+                        BarItem(R.string.nav_resume, Icons.Default.PlayArrow, false) { pauseOrResume() }
+                    } else {
+                        BarItem(R.string.nav_pause, Icons.Default.Pause, false) { pauseOrResume() }
+                    },
+                    BarItem(R.string.nav_repeat, Icons.Default.Replay, false) { repeatLast() },
+                    BarItem(R.string.nav_settings, Icons.Default.Settings, currentPage == PAGE_SETTINGS) {
+                        currentPage = PAGE_SETTINGS
+                    }
+                )
+                barItems.forEach { item ->
+                    val label = stringResource(item.label)
                     NavigationBarItem(
-                        icon = { Icon(screen.second, contentDescription = stringResource(screen.first), modifier = Modifier.size(32.dp)) },
-                        label = null,
-                        selected = currentPage == index,
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent,
-                            selectedIconColor = Color.White,
-                            selectedTextColor = Color.White,
-                            unselectedIconColor = Color.Gray,
-                            unselectedTextColor = Color.Gray
-                        ),
+                        icon = { Icon(item.icon, contentDescription = null, modifier = Modifier.size(32.dp)) },
+                        label = { Text(label, fontSize = 13.sp, maxLines = 1) },
+                        selected = item.selected,
+                        colors = itemColors,
+                        modifier = Modifier.semantics { contentDescription = label },
                         onClick = {
-                            currentPage = index
+                            feedback.vibrate(HapticPattern.SHORT, force = true)
+                            failureCounter.onRecognized()
+                            item.onClick()
                         }
                     )
                 }

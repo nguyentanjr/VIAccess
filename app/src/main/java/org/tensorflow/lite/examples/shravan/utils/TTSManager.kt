@@ -59,6 +59,8 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
             }
         } else {
             Log.e("TTSManager", "Initialization Failed!")
+            initFailed = true
+            mainHandler.post { onInitFailed?.invoke() }
             // Fail gracefully by calling onComplete for pending requests
             mainHandler.post {
                 val requestsToPlay = ArrayList(pendingRequests)
@@ -98,6 +100,15 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
     }
 
 
+    /** Máy không có giọng đọc tiếng Việt (báo một lần). Gọi trên main thread. */
+    var onVietnameseVoiceMissing: (() -> Unit)? = null
+    private var missingVoiceReported = false
+
+    /** Không khởi tạo được TTS (máy không có engine). */
+    var onInitFailed: (() -> Unit)? = null
+    var initFailed = false
+        private set
+
     fun setLanguage(isVietnamese: Boolean) {
         lastIsVietnamese = isVietnamese
         if (!isInitialized) return
@@ -106,9 +117,16 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
         val result = tts?.setLanguage(locale)
         if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
             Log.e("TTSManager", "Language not supported: $locale")
+            var stillMissing = true
             if (isVietnamese) {
                 // Fallback attempt with generic "vi"
-                tts?.setLanguage(Locale("vi"))
+                val fallback = tts?.setLanguage(Locale("vi"))
+                stillMissing = fallback == TextToSpeech.LANG_MISSING_DATA ||
+                    fallback == TextToSpeech.LANG_NOT_SUPPORTED || fallback == null
+            }
+            if (stillMissing && isVietnamese && !missingVoiceReported) {
+                missingVoiceReported = true
+                mainHandler.post { onVietnameseVoiceMissing?.invoke() }
             }
         }
         // Re-apply speech rate as setLanguage can sometimes reset it

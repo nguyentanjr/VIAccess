@@ -16,7 +16,12 @@ import androidx.core.content.ContextCompat
 class VoiceCommandManager(private val context: Context) {
     private var speechRecognizer: SpeechRecognizer? = null
     private var isListening = false
-    var onGlobalIntent: ((String) -> Boolean)? = null
+    /** (câu nói, là kết quả cuối) → true nếu lệnh chung đã xử lý, không chuyển cho màn hình. */
+    var onGlobalIntent: ((String, Boolean) -> Boolean)? = null
+    /** Báo lỗi nhận giọng nói cần nói cho người dùng (mạng, quyền, máy không hỗ trợ). */
+    var onVoiceError: ((VoiceError) -> Unit)? = null
+    /** App đang ở nền: không nghe. */
+    private var suspended = false
     private var onResult: ((String) -> Unit)? = null
     private var onPartialResult: ((String) -> Unit)? = null
     private var lastIsVietnamese = true
@@ -60,8 +65,20 @@ class VoiceCommandManager(private val context: Context) {
             override fun onError(error: Int) {
                 Log.e("VoiceCommandManager", "Error: $error (Session: $currentSessionId)")
                 isListening = false
-                if (shouldRetry && (error == SpeechRecognizer.ERROR_NO_MATCH || error == SpeechRecognizer.ERROR_SPEECH_TIMEOUT)) {
-                    handler.post { startListeningInternal() }
+                when (error) {
+                    SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT ->
+                        if (shouldRetry) handler.post { startListeningInternal() }
+                    SpeechRecognizer.ERROR_NETWORK, SpeechRecognizer.ERROR_NETWORK_TIMEOUT,
+                    SpeechRecognizer.ERROR_SERVER -> {
+                        onVoiceError?.invoke(VoiceError.NETWORK)
+                        if (shouldRetry) handler.postDelayed(
+                            { startListeningInternal() }, FeedbackConfig.VOICE_NETWORK_RETRY_MS
+                        )
+                    }
+                    SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS ->
+                        onVoiceError?.invoke(VoiceError.PERMISSION)
+                    SpeechRecognizer.ERROR_RECOGNIZER_BUSY ->
+                        if (shouldRetry) handler.postDelayed({ startListeningInternal() }, 500L)
                 }
             }
             override fun onResults(results: Bundle?) {
@@ -70,7 +87,7 @@ class VoiceCommandManager(private val context: Context) {
                     var handled = false
                     for (match in matches) {
                         val trimmedMatch = match.trim().lowercase()
-                        if (onGlobalIntent?.invoke(trimmedMatch) == true) {
+                        if (onGlobalIntent?.invoke(trimmedMatch, true) == true) {
                             handled = true
                             break
                         }
@@ -89,7 +106,7 @@ class VoiceCommandManager(private val context: Context) {
                 if (!matches.isNullOrEmpty()) {
                     for (match in matches) {
                         val trimmedMatch = match.trim().lowercase()
-                        if (onGlobalIntent?.invoke(trimmedMatch) == true) {
+                        if (onGlobalIntent?.invoke(trimmedMatch, false) == true) {
                             isListening = false
                             break
                         }
@@ -109,6 +126,11 @@ class VoiceCommandManager(private val context: Context) {
             try {
                 if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
                     Log.e("VoiceCommandManager", "RECORD_AUDIO permission not granted")
+                    onVoiceError?.invoke(VoiceError.PERMISSION)
+                    return@post
+                }
+                if (!SpeechRecognizer.isRecognitionAvailable(context)) {
+                    onVoiceError?.invoke(VoiceError.UNAVAILABLE)
                     return@post
                 }
                 onResult = callback
@@ -134,7 +156,11 @@ class VoiceCommandManager(private val context: Context) {
     }
 
     private fun startListeningInternal() {
-        if (isListening) return
+        if (isListening || suspended) return
+        if (speechRecognizer == null) {
+            onVoiceError?.invoke(VoiceError.UNAVAILABLE)
+            return
+        }
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
             putExtra(RecognizerIntent.EXTRA_LANGUAGE, if (lastIsVietnamese) "vi-VN" else "en-US")
@@ -173,6 +199,22 @@ class VoiceCommandManager(private val context: Context) {
         isListening = false
     }
 
+    /** App chạy nền: hủy phiên nghe hiện tại nhưng nhớ để nghe lại khi [resume]. */
+    fun suspend() {
+        handler.post {
+            suspended = true
+            speechRecognizer?.cancel()
+            isListening = false
+        }
+    }
+
+    fun resume() {
+        handler.post {
+            suspended = false
+            if (shouldRetry) startListeningInternal()
+        }
+    }
+
     fun destroy() {
         handler.post {
             shouldRetry = false
@@ -180,3 +222,5 @@ class VoiceCommandManager(private val context: Context) {
         }
     }
 }
+
+enum class VoiceError { NETWORK, PERMISSION, UNAVAILABLE }

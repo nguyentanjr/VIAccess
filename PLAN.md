@@ -186,8 +186,8 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 - [ ] `[S]` Build + chạy trên máy thật, ghi model máy test *(build OK; chưa thử máy thật)*
 - [x] `[S]` Tạo `FeedbackConfig.kt`
 - [x] `[L]` `FeedbackCoordinator` (hàng đợi ưu tiên, cooldown, giới hạn) + chuyển mọi lời nói qua Coordinator *(Find, OCR, YOLO, MainScreen; Setup/Tutorial/Settings/AccessibleButton còn gọi trực tiếp — Hoàng chuyển khi làm onboarding/Settings)*
-- [ ] `[M]` 5 lệnh giọng nói + nút chạm dự phòng
-- [ ] `[M]` Xử lý lỗi bằng giọng nói (thiếu quyền, thiếu giọng TTS tiếng Việt, mất mạng, lỗi mô hình) + dừng TTS / rung / camera khi app chạy nền
+- [x] `[M]` 5 lệnh giọng nói + nút chạm dự phòng *(VoiceCommandParser; thanh nút Tìm / Đọc chữ / Dừng-Tiếp / Đọc lại / Cài đặt; chưa thử máy thật)*
+- [x] `[M]` Xử lý lỗi bằng giọng nói (thiếu quyền, thiếu giọng TTS tiếng Việt, mất mạng, lỗi mô hình) + dừng TTS / rung / camera khi app chạy nền *(chưa thử máy thật)*
 - [ ] `[S]` Chủ trì checklist kiểm thử chức năng (6.1)
 - [ ] `[M]` Báo cáo: kiến trúc, luồng tương tác, bảng kế thừa / tự phát triển (1.4)
 - [ ] `[M]` Chuẩn bị demo (máy, đạo cụ) + quay video demo S1–S4
@@ -262,3 +262,4 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 |---|---|---|
 | 2026-10-19 | — | Tạo repo VIAccess từ VisionAid, viết CLAUDE.md / PLAN.md |
 | 2026-10-22 | Tân | Nhánh tan/foundation: sửa build, gỡ Explore/History/Themes, FeedbackConfig, FeedbackCoordinator + 8 unit test |
+| 2026-11-10 | Tân | 5 lệnh giọng nói + nút chạm, dừng/tiếp/đọc lại trong Coordinator, báo lỗi bằng giọng nói, tạm ngưng khi chạy nền; +9 unit test |

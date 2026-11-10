@@ -61,6 +61,16 @@ object FeedbackConfig {
     const val HAPTIC_INTERVAL_FAR_MS = 1000L
     const val HAPTIC_INTERVAL_NEAR_MS = 250L
 
+    // --- Lệnh giọng nói & lỗi (PLAN 4.4) ---
+    /** Không nhận ra lệnh liên tiếp bao nhiêu lần thì nhắc dùng nút chạm. */
+    const val VOICE_MAX_FAILURES = 3
+    /** Bỏ qua cùng một lệnh lặp lại trong khoảng này (kết quả tạm + kết quả cuối của cùng một câu). */
+    const val VOICE_COMMAND_DEDUP_MS = 1500L
+    /** Lỗi mạng của SpeechRecognizer: chờ khoảng này rồi nghe lại. */
+    const val VOICE_NETWORK_RETRY_MS = 5000L
+    /** Báo lỗi mạng tối đa một lần trong khoảng này. */
+    const val VOICE_NETWORK_ALERT_COOLDOWN_MS = 60_000L
+
     // --- Rung ---
     const val HAPTIC_SHORT_MS = 50L
     const val HAPTIC_DEFAULT_MS = 100L
