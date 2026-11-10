@@ -52,6 +52,14 @@ class SettingsManager(context: Context) {
             prefs.edit().putBoolean("haptics_enabled", value).apply()
         }
 
+    private var _baselineMode = mutableStateOf(prefs.getBoolean("baseline_mode", false))
+    var baselineMode: Boolean
+        get() = _baselineMode.value
+        set(value) {
+            _baselineMode.value = value
+            prefs.edit().putBoolean("baseline_mode", value).apply()
+        }
+
     private var _useVietnamese = mutableStateOf(prefs.getBoolean("use_vietnamese", false))
     var useVietnamese: Boolean
         get() = _useVietnamese.value
@@ -74,6 +82,7 @@ class SettingsManager(context: Context) {
         activeThemeIndex = 3
         speechRate = 1.0f
         hapticsEnabled = true
+        baselineMode = false
         useVietnamese = false
         flashMode = "auto"
     }

@@ -68,4 +68,13 @@
     <string name="permission_body">The app needs the camera to see text and objects, and the microphone to hear commands. Tap the large button below to grant them.</string>
     <string name="permission_grant">Grant permission</string>
     <string name="permission_open_settings">Open app settings</string>
-    <string name="permission_denied_forever">Permission was denied. Tap the button to open app settings and allow camera and microphone.</string></resources>
+    <string name="permission_denied_forever">Permission was denied. Tap the button to open app settings and allow camera and microphone.</string>
+<!-- Camera alignment for OCR (PLAN 4.2) -->
+    <string name="align_dark">Low light</string>
+    <string name="align_shaky">Hold the phone still</string>
+    <string name="align_blurry">Image is blurry, hold still</string>
+    <string name="align_too_close">Move the phone back</string>
+    <string name="align_off_left">Text is to the left</string>
+    <string name="align_off_right">Text is to the right</string>
+    <string name="align_too_small">Move closer</string>
+    <string name="align_no_text">No text yet</string></resources>

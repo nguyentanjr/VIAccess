@@ -68,4 +68,13 @@
     <string name="permission_body">Ứng dụng cần camera để nhìn chữ và đồ vật, và micro để nghe lệnh. Chạm vào nút lớn bên dưới để cấp quyền.</string>
     <string name="permission_grant">Cấp quyền</string>
     <string name="permission_open_settings">Mở cài đặt ứng dụng</string>
-    <string name="permission_denied_forever">Quyền đã bị từ chối. Chạm vào nút để mở cài đặt ứng dụng và bật quyền camera, micro.</string></resources>
+    <string name="permission_denied_forever">Quyền đã bị từ chối. Chạm vào nút để mở cài đặt ứng dụng và bật quyền camera, micro.</string>
+<!-- Căn camera cho OCR (PLAN 4.2) -->
+    <string name="align_dark">Ánh sáng yếu</string>
+    <string name="align_shaky">Giữ yên máy</string>
+    <string name="align_blurry">Ảnh mờ, giữ yên</string>
+    <string name="align_too_close">Đưa máy ra xa</string>
+    <string name="align_off_left">Lệch trái</string>
+    <string name="align_off_right">Lệch phải</string>
+    <string name="align_too_small">Lại gần</string>
+    <string name="align_no_text">Chưa thấy chữ</string></resources>

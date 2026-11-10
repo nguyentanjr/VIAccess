@@ -194,14 +194,14 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 
 ### 9.2 Tiến — Đọc văn bản T1 (19)
 - [ ] `[M]` Bỏ tiếng Anh: strings, `coco.txt`, nhánh `useVietnamese`
-- [ ] `[L]` `ImageQuality`: Laplacian + vị trí / kích thước khung chữ
-- [ ] `[M]` `MotionMonitor`: gyroscope
-- [ ] `[L]` Luật căn camera 4.2 theo thứ tự ưu tiên + hiệu chỉnh ngưỡng
-- [ ] `[M]` Tích hợp vào `OCRScreen` + auto-capture
-- [ ] `[S]` `baselineMode` cho T1 (tắt nhắc căn chỉnh, đọc liên tục)
+- [x] `[L]` `ImageQuality`: Laplacian + vị trí / kích thước khung chữ *(ngưỡng Laplacian chưa hiệu chỉnh trên máy thật)*
+- [x] `[M]` `MotionMonitor`: gyroscope
+- [ ] `[L]` Luật căn camera 4.2 theo thứ tự ưu tiên + hiệu chỉnh ngưỡng *(luật xong trong `AlignmentAdvisor` + 8 test; còn hiệu chỉnh ngưỡng trên máy thật)*
+- [x] `[M]` Tích hợp vào `OCRScreen` + auto-capture *(chưa thử máy thật)*
+- [x] `[S]` `baselineMode` cho T1 (tắt nhắc căn chỉnh, đọc liên tục) *(chưa có công tắc trong Settings)*
 - [ ] `[L]` 30 mẫu OCR × 3 mức sáng + bản gõ tay, tính CER/WER, tỷ lệ tự chụp thành công
 - [ ] `[M]` Báo cáo: chương T1 + kết quả OCR
-- [ ] `[S]` README: hướng dẫn cài đặt và sử dụng
+- [x] `[S]` README: hướng dẫn cài đặt và sử dụng
 
 ### 9.3 Hùng — Tìm vật thể T2 (19)
 - [ ] `[M]` Danh sách 6 vật + lệnh "tìm <vật>"
@@ -263,3 +263,4 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 | 2026-10-19 | — | Tạo repo VIAccess từ VisionAid, viết CLAUDE.md / PLAN.md |
 | 2026-10-22 | Tân | Nhánh tan/foundation: sửa build, gỡ Explore/History/Themes, FeedbackConfig, FeedbackCoordinator + 8 unit test |
 | 2026-11-10 | Tân | 5 lệnh giọng nói + nút chạm, dừng/tiếp/đọc lại trong Coordinator, báo lỗi bằng giọng nói, tạm ngưng khi chạy nền; +9 unit test |
+| 2026-11-10 | Tiến (Tân làm hộ) | ImageQuality, MotionMonitor, AlignmentAdvisor (luật 4.2) + 8 test, gắn vào OCRScreen + tự chụp, baselineMode T1, README |
