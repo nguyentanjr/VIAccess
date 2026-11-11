@@ -200,7 +200,7 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 - [x] `[M]` Tích hợp vào `OCRScreen` + auto-capture *(chưa thử máy thật)*
 - [x] `[S]` `baselineMode` cho T1 (tắt nhắc căn chỉnh, đọc liên tục) *(chưa có công tắc trong Settings)*
 - [ ] `[L]` 30 mẫu OCR × 3 mức sáng + bản gõ tay, tính CER/WER, tỷ lệ tự chụp thành công
-- [ ] `[M]` Báo cáo: chương T1 + kết quả OCR
+- [ ] `[M]` Báo cáo: chương T1 + kết quả OCR *(nháp: docs/bao_cao/chuong_t1_doc_van_ban.md, chờ số liệu)*
 - [x] `[S]` README: hướng dẫn cài đặt và sử dụng
 
 ### 9.3 Hùng — Tìm vật thể T2 (19)
