@@ -60,13 +60,8 @@ class SettingsManager(context: Context) {
             prefs.edit().putBoolean("baseline_mode", value).apply()
         }
 
-    private var _useVietnamese = mutableStateOf(prefs.getBoolean("use_vietnamese", false))
-    var useVietnamese: Boolean
-        get() = _useVietnamese.value
-        set(value) {
-            _useVietnamese.value = value
-            prefs.edit().putBoolean("use_vietnamese", value).apply()
-        }
+    /** App chỉ hỗ trợ tiếng Việt (PLAN 1.3). Giữ thuộc tính để code cũ đọc được, luôn là true. */
+    val useVietnamese: Boolean get() = true
 
     private var _flashMode = mutableStateOf(prefs.getString("flash_mode", "auto") ?: "auto")
     var flashMode: String
@@ -83,7 +78,6 @@ class SettingsManager(context: Context) {
         speechRate = 1.0f
         hapticsEnabled = true
         baselineMode = false
-        useVietnamese = false
         flashMode = "auto"
     }
 }

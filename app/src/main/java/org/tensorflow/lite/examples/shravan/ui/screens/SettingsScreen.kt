@@ -31,14 +31,9 @@ fun SettingsScreen(
     resetCount: Int = 0,
     onResetClick: () -> Unit = {}
 ) {
-    var languageExpanded by remember { mutableStateOf(false) }
     var flashExpanded by remember { mutableStateOf(false) }
-    var languageTextFieldSize by remember { mutableStateOf(androidx.compose.ui.geometry.Size.Zero) }
     var flashFieldSize by remember { mutableStateOf(androidx.compose.ui.geometry.Size.Zero) }
 
-    val langEn = stringResource(R.string.lang_en)
-    val langVi = stringResource(R.string.lang_vi)
-    val languages = listOf(langEn to false, langVi to true)
     val flashes = listOf(
         stringResource(R.string.flash_auto) to "auto",
         stringResource(R.string.flash_on) to "on",
@@ -72,50 +67,6 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
-
-        // Language
-        Box(modifier = Modifier.fillMaxWidth()) {
-            OutlinedTextField(
-                value = if (settingsManager.useVietnamese) langVi else langEn,
-                onValueChange = {},
-                readOnly = true,
-                enabled = false, // Use Box for click
-                label = { Text(stringResource(R.string.settings_language)) },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = languageExpanded) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onGloballyPositioned { languageTextFieldSize = it.size.toSize() }
-                    .clickable { 
-                        hapticManager.triggerHaptic()
-                        languageExpanded = true 
-                    },
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledTextColor = Color.White,
-                    disabledBorderColor = Color.White,
-                    disabledLabelColor = Color.White,
-                    disabledTrailingIconColor = Color.White
-                )
-            )
-            DropdownMenu(
-                expanded = languageExpanded,
-                onDismissRequest = { languageExpanded = false },
-                modifier = Modifier
-                    .width(with(LocalDensity.current) { languageTextFieldSize.width.toDp() })
-                    .background(Color(0xFF333333))
-            ) {
-                languages.forEach { (label, isVi) ->
-                    DropdownMenuItem(
-                        text = { Text(label, color = if (settingsManager.useVietnamese == isVi) Color.Yellow else Color.White, fontSize = 18.sp) },
-                        onClick = {
-                            hapticManager.triggerHaptic()
-                            settingsManager.useVietnamese = isVi
-                            ttsManager.setLanguage(isVi)
-                            languageExpanded = false
-                        }
-                    )
-                }
-            }
-        }
 
         // Haptics
         Row(

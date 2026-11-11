@@ -44,8 +44,7 @@ class YoloAnalyzer(
         val useVi = settingsManager.useVietnamese
         if (currentDetector == null || lastUsedLanguage != useVi) {
             val labelFile = when {
-                useVi -> "file:///android_asset/coco_vi.txt"
-                else -> "file:///android_asset/coco.txt"
+                else -> "file:///android_asset/coco_vi.txt"
             }
             currentDetector?.close()
             currentDetector = DetectorFactory.getDetector(context.assets, modelName, labelFile)
@@ -60,8 +59,7 @@ class YoloAnalyzer(
         val labelsList = mutableListOf<String>()
         val useVi = settingsManager.useVietnamese
         val filename = when {
-            useVi -> "coco_vi.txt"
-            else -> "coco.txt"
+            else -> "coco_vi.txt"
         }
         try {
             val reader = BufferedReader(InputStreamReader(context.assets.open(filename)))

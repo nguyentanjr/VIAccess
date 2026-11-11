@@ -39,9 +39,9 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
     override fun onInit(status: Int) {
         if (status == TextToSpeech.SUCCESS) {
             // Attempt to set default language, but don't block initialization if it fails
-            val result = tts?.setLanguage(Locale.US)
+            val result = tts?.setLanguage(localeVi)
             if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                Log.w("TTSManager", "Locale.US not supported, using default")
+                Log.w("TTSManager", "vi-VN not supported, using default")
                 tts?.setLanguage(Locale.getDefault())
             }
             

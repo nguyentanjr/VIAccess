@@ -193,7 +193,7 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 - [ ] `[M]` Chuẩn bị demo (máy, đạo cụ) + quay video demo S1–S4
 
 ### 9.2 Tiến — Đọc văn bản T1 (19)
-- [ ] `[M]` Bỏ tiếng Anh: strings, `coco.txt`, nhánh `useVietnamese`
+- [x] `[M]` Bỏ tiếng Anh: strings, `coco.txt`, nhánh `useVietnamese`
 - [x] `[L]` `ImageQuality`: Laplacian + vị trí / kích thước khung chữ *(ngưỡng Laplacian chưa hiệu chỉnh trên máy thật)*
 - [x] `[M]` `MotionMonitor`: gyroscope
 - [ ] `[L]` Luật căn camera 4.2 theo thứ tự ưu tiên + hiệu chỉnh ngưỡng *(luật xong trong `AlignmentAdvisor` + 8 test; còn hiệu chỉnh ngưỡng trên máy thật)*
@@ -265,3 +265,4 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 | 2026-11-10 | Tân | 5 lệnh giọng nói + nút chạm, dừng/tiếp/đọc lại trong Coordinator, báo lỗi bằng giọng nói, tạm ngưng khi chạy nền; +9 unit test |
 | 2026-11-10 | Tiến (Tân làm hộ) | ImageQuality, MotionMonitor, AlignmentAdvisor (luật 4.2) + 8 test, gắn vào OCRScreen + tự chụp, baselineMode T1, README |
 | 2026-11-11 | Hùng | Gộp main vào nhánh hung; sửa theo review: ngôn ngữ câu "Đang tìm", không báo "mất dấu" khi thấy lại vật, vẽ hộp từ kết quả persistence, so tên vật theo từ, MetricLogger dùng chung formatter |
+| 2026-11-11 | Tiến | Bỏ tiếng Anh: chỉ còn strings tiếng Việt, xoá coco.txt, useVietnamese luôn true, bỏ chọn ngôn ngữ ở Cài đặt và màn thiết lập; viết lại lời hướng dẫn |

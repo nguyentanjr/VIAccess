@@ -87,7 +87,7 @@ fun TutorialScreen(
                 CircularProgressIndicator(color = Color.White)
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = if (useVietnamese) "Vui lòng cấp quyền để tiếp tục..." else "Please grant permissions to continue...",
+                    text = stringResource(R.string.tutorial_grant_permission),
                     color = Color.White,
                     fontSize = 18.sp,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center

@@ -118,7 +118,7 @@ class MainActivity : ComponentActivity() {
                     return@setContent
                 }
 val useVietnamese = settingsManager.useVietnamese
-val locale = remember(useVietnamese) { if (useVietnamese) java.util.Locale("vi") else java.util.Locale.ENGLISH }
+val locale = remember { java.util.Locale("vi") }
 
 LaunchedEffect(locale) {
     java.util.Locale.setDefault(locale)
