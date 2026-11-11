@@ -19,6 +19,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -372,38 +375,48 @@ fun FindScreen(
                 .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 88.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            FindTarget.values().toList().chunked(2).forEach { rowTargets ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    rowTargets.forEach { target ->
-                        val selected = activeTarget == target
-                        Button(
-                            onClick = { activeTarget = target },
-                            modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = if (selected) {
-                                    MaterialTheme.colorScheme.primary
-                                } else {
-                                    MaterialTheme.colorScheme.secondaryContainer
-                                },
-                                contentColor = if (selected) {
-                                    MaterialTheme.colorScheme.onPrimary
-                                } else {
-                                    MaterialTheme.colorScheme.onSecondaryContainer
-                                }
-                            )
-                        ) {
-                            Text(
-                                text = target.displayLabel(languageContext),
-                                fontSize = 16.sp
-                            )
+            // 17 vật: lưới 3 cột, cuộn được, cao tối đa ~3 hàng để không che camera.
+            // 6 vật gốc xếp trước.
+            Column(
+                modifier = Modifier
+                    .heightIn(max = 196.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                FindTarget.entries.chunked(3).forEach { rowTargets ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        rowTargets.forEach { target ->
+                            val selected = activeTarget == target
+                            Button(
+                                onClick = { activeTarget = target },
+                                modifier = Modifier.weight(1f).heightIn(min = 56.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (selected) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.secondaryContainer
+                                    },
+                                    contentColor = if (selected) {
+                                        MaterialTheme.colorScheme.onPrimary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSecondaryContainer
+                                    }
+                                )
+                            ) {
+                                Text(
+                                    text = target.displayName,
+                                    fontSize = 18.sp,
+                                    maxLines = 2,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                            }
                         }
-                    }
-                    if (rowTargets.size == 1) {
-                        Spacer(modifier = Modifier.weight(1f))
+                        repeat(3 - rowTargets.size) { Spacer(modifier = Modifier.weight(1f)) }
                     }
                 }
             }
@@ -536,17 +549,9 @@ private fun directionResource(direction: FindDirection?): Int = when (direction)
     null -> R.string.find_direction_center
 }
 
-private fun FindTarget.displayLabel(context: Context): String =
-    context.getString(
-        when (this) {
-            FindTarget.CUP -> R.string.find_target_cup
-            FindTarget.BOTTLE -> R.string.find_target_bottle
-            FindTarget.PHONE -> R.string.find_target_phone
-            FindTarget.REMOTE -> R.string.find_target_remote
-            FindTarget.BOOK -> R.string.find_target_book
-            FindTarget.CHAIR -> R.string.find_target_chair
-        }
-    )
+@Suppress("UNUSED_PARAMETER")
+/** Tên vật dùng trong câu nói / dòng trạng thái ("Đang tìm chuột"); nút dùng [FindTarget.displayName]. */
+private fun FindTarget.displayLabel(context: Context): String = displayName.replaceFirstChar { it.lowercase() }
 
 private fun Context.withLanguage(isVietnamese: Boolean): Context {
     val configuration = Configuration(resources.configuration)

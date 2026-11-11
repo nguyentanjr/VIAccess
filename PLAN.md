@@ -22,7 +22,8 @@ Người khiếm thị dùng điện thoại Android (camera) để **(1) đọc
 | H2 | TTS & rung | Kênh phản hồi chung, có bộ điều phối chống quá tải |
 | H3 | Accessibility | Chữ to, tương phản cao, nút lớn, nhãn TalkBack (yêu cầu phi chức năng) |
 
-**6 vật mục tiêu (lớp COCO):** cup (cốc), bottle (chai), cell phone (điện thoại), remote (điều khiển), book (sách), chair (ghế).
+**6 vật mục tiêu chính (lớp COCO, dùng cho bộ đánh giá 150 ảnh):** cup (cốc), bottle (chai), cell phone (điện thoại), remote (điều khiển), book (sách), chair (ghế).
+**11 vật mở rộng (2026-11-11, xem mục 11):** backpack (ba lô), handbag (túi xách), umbrella (ô), laptop, mouse (chuột), keyboard (bàn phím), clock (đồng hồ), scissors (kéo), spoon (thìa), bowl (bát), toothbrush (bàn chải đánh răng).
 
 ### 1.3 Ngoài phạm vi
 Explore tự đọc mọi vật · nhận diện tiền · History · Themes · mô tả cảnh · dẫn đường ngoài trời · đọc nhiều cột theo thứ tự · ước lượng khoảng cách bằng mét · huấn luyện mô hình mới · tiếng Anh (chỉ làm tiếng Việt).
@@ -257,6 +258,8 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 - Trang trong MainScreen: 0 = Tìm vật, 1 = Đọc chữ, 2 = Cài đặt. Bỏ lệnh giờ / pin / trạng thái, giữ "giúp đỡ".
 - Cách dùng Coordinator: `feedback.say(text, Priority.X, key = ..., queue = ..., userInitiated = ...)` và `feedback.vibrate(pattern, force)`. Lời do người dùng yêu cầu thì `userInitiated = true`; rung xác nhận thì `force = true`.
 
+- **2026-11-11 – Mở rộng vật tìm từ 6 lên 17** (Tân đề xuất): thêm 11 lớp COCO có sẵn, không cần huấn luyện lại. Đánh giá P/R/F1 vẫn chỉ trên 6 vật chính để giữ khối lượng; 11 vật mới chỉ kiểm thử chức năng. Màn Tìm đổi sang lưới 3 cột cuộn được.
+
 ## 12. Nhật ký
 | Ngày | Ai | Ghi chú |
 |---|---|---|
@@ -268,3 +271,4 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 | 2026-11-11 | Tiến | Bỏ tiếng Anh: chỉ còn strings tiếng Việt, xoá coco.txt, useVietnamese luôn true, bỏ chọn ngôn ngữ ở Cài đặt và màn thiết lập; viết lại lời hướng dẫn |
 | 2026-11-11 | Hoàng | ReadingController (đọc theo câu, +5 test), Cài đặt mới (chữ 24sp, mức chi tiết, chế độ so sánh A/B), nhãn TalkBack cho nút, script eval/ (SUS, TLX, Wilcoxon, P/R/F1, CER/WER, độ trễ), tài liệu khảo sát / wireframe / kịch bản thử nghiệm |
 | 2026-11-11 | Tân | Soạn bản phạm vi gửi cô, checklist kiểm thử 6.1 (+ heuristic), nháp chương kiến trúc & luồng |
+| 2026-11-11 | Tân | Mở rộng Tìm vật lên 17 vật (FindTarget + lưới 3 cột), +2 test (so khớp lệnh, khớp nhãn coco_vi) |

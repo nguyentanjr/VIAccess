@@ -20,6 +20,27 @@ class FindTargetTest {
     }
 
     @Test
+    fun parsesExtendedTargetsAndPrefersLongestAlias() {
+        assertEquals(FindTarget.BACKPACK, FindTarget.fromCommand("tìm ba lô"))
+        assertEquals(FindTarget.KEYBOARD, FindTarget.fromCommand("tìm bàn phím"))
+        assertEquals(FindTarget.TOOTHBRUSH, FindTarget.fromCommand("tìm bàn chải đánh răng"))
+        assertEquals(FindTarget.HANDBAG, FindTarget.fromCommand("tìm túi xách"))
+        assertEquals(FindTarget.LAPTOP, FindTarget.fromCommand("tìm máy tính"))
+        assertEquals(FindTarget.UMBRELLA, FindTarget.fromCommand("tìm cái ô"))
+        assertEquals(FindTarget.BOWL, FindTarget.fromCommand("tìm cái chén"))
+        // "ở" không được hiểu nhầm thành "ô".
+        assertEquals(FindTarget.CUP, FindTarget.fromCommand("tìm cốc ở đâu"))
+    }
+
+    @Test
+    fun everyTargetMatchesItsVietnameseCocoLabel() {
+        val labels = java.io.File("src/main/assets/coco_vi.txt").readLines(Charsets.UTF_8)
+        FindTarget.entries.forEach { t ->
+            assertEquals("${t.name} classId", t.vietnameseLabel, labels[t.classId].trim())
+        }
+    }
+
+    @Test
     fun matchesWholeWordsOnly() {
         // "nghe" chứa "ghe" nhưng không phải "ghế"; "time" chứa "tim" nhưng không phải lệnh tìm.
         assertNull(FindTarget.fromCommand("tìm nhạc để nghe"))
