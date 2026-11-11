@@ -106,6 +106,17 @@ fun CameraPreview(
             val camera = if (imageAnalyzer != null) {
                 val analysis = ImageAnalysis.Builder()
                     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                    // 1280×960 thay cho mặc định 640×480: chữ nhỏ và mã QR có đủ điểm ảnh để đọc.
+                    // YOLO vẫn co ảnh về 416 nên không chậm thêm đáng kể.
+                    .setResolutionSelector(
+                        androidx.camera.core.resolutionselector.ResolutionSelector.Builder()
+                            .setResolutionStrategy(
+                                androidx.camera.core.resolutionselector.ResolutionStrategy(
+                                    android.util.Size(1280, 960),
+                                    androidx.camera.core.resolutionselector.ResolutionStrategy.FALLBACK_RULE_CLOSEST_LOWER_THEN_HIGHER
+                                )
+                            ).build()
+                    )
                     .build()
                 analysis.setAnalyzer(cameraExecutor, imageAnalyzer)
                 analysisUseCase = analysis

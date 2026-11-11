@@ -105,7 +105,7 @@
     <string name="qr_wifi">Mã QR wifi. Tên mạng %1$s. Mật khẩu %2$s</string>
     <string name="qr_wifi_open">Mã QR wifi. Tên mạng %1$s, không có mật khẩu</string>
     <string name="qr_phone">Mã QR số điện thoại %1$s</string>
-    <string name="qr_vietqr">Mã chuyển khoản VietQR</string>
+    <string name="qr_vietqr">Mã thanh toán QR</string>
     <string name="qr_vietqr_name">người nhận %1$s</string>
     <string name="qr_vietqr_account">số tài khoản %1$s</string>
     <string name="qr_vietqr_amount">số tiền %1$s đồng</string>

@@ -27,6 +27,15 @@ class BarcodeInfoTest {
     }
 
     @Test
+    fun realVnpayMerchantQrFromEmulatorTest() {
+        // Mã đọc được trên máy ảo (2026-11-11): VNPay của cửa hàng, không có tag 38 (số tài khoản).
+        val raw = "00020101021226280010A000000775011003118280365204539953037045405470005802VN" +
+            "5910FOODY CORP6005HANOI610610000062750311DeliveryNow05210126102518475099087410710FOODYCORP" +
+            "10817Thanh toan QRCode63041DA9"
+        assertEquals(BarcodeInfo.VietQr("FOODY CORP", null, "47000"), BarcodeInfo.parse(raw))
+    }
+
+    @Test
     fun malformedVietQrFallsBackToText() {
         assertEquals(BarcodeInfo.Text("000201xx"), BarcodeInfo.parse("000201xx"))
     }

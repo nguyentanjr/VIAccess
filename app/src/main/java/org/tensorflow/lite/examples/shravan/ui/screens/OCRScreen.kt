@@ -65,6 +65,8 @@ fun OCRScreen(
     val barcodeScanner = remember { com.google.mlkit.vision.barcode.BarcodeScanning.getClient() }
     DisposableEffect(barcodeScanner) { onDispose { barcodeScanner.close() } }
     val lastBarcode = remember { mutableMapOf<String, Long>() }
+    /** Lúc vừa đọc một mã: tạm không tự đọc chữ để không ngắt lời đọc mã. */
+    var lastBarcodeAt by remember { mutableStateOf(-FeedbackConfig.BARCODE_REPEAT_MS) }
     val qrStrings = mapOf(
         "text" to stringResource(R.string.qr_text),
         "link" to stringResource(R.string.qr_link),
@@ -82,6 +84,7 @@ fun OCRScreen(
         val now = android.os.SystemClock.elapsedRealtime()
         if (now - (lastBarcode[raw] ?: -FeedbackConfig.BARCODE_REPEAT_MS) < FeedbackConfig.BARCODE_REPEAT_MS) return
         lastBarcode[raw] = now
+        lastBarcodeAt = now
         val product = code.format in setOf(
             com.google.mlkit.vision.barcode.common.Barcode.FORMAT_EAN_13,
             com.google.mlkit.vision.barcode.common.Barcode.FORMAT_EAN_8,
@@ -133,7 +136,11 @@ fun OCRScreen(
                     val inputImage = InputImage.fromMediaImage(mediaImage, rotation)
                     // QR / mã vạch chạy song song với đọc chữ trên cùng khung hình.
                     val barcodeTask = barcodeScanner.process(inputImage)
-                        .addOnSuccessListener { codes -> codes.firstOrNull()?.let { announceBarcode(it) } }
+                        .addOnSuccessListener { codes ->
+                            if (codes.isNotEmpty()) android.util.Log.d("VIA_QR", "codes=${codes.size} ${codes.joinToString { it.format.toString() + ":" + it.rawValue }}")
+                            codes.firstOrNull()?.let { announceBarcode(it) }
+                        }
+                        .addOnFailureListener { e -> android.util.Log.e("VIA_QR", "Barcode scan failed", e) }
                     val textTask = rec.process(inputImage)
                         .addOnSuccessListener { visionText ->
                             val text = visionText.text
@@ -168,7 +175,8 @@ fun OCRScreen(
                                 AlignmentAdvice.NONE -> Unit
                                 AlignmentAdvice.OK -> {
                                     // Tự chụp: đạt hết điều kiện + chữ ổn định 3/5 frame (OCRManager) → rung ngắn → đọc.
-                                    if (ocrManager?.shouldSpeak(text) == true) {
+                                    val barcodeRecent = android.os.SystemClock.elapsedRealtime() - lastBarcodeAt < FeedbackConfig.BARCODE_REPEAT_MS
+                                    if (!barcodeRecent && ocrManager?.shouldSpeak(text) == true) {
                                         feedback.vibrate(HapticPattern.SHORT, force = true)
                                         // Đọc theo từng câu để dừng / tiếp / đọc lại đúng chỗ.
                                         reader.start(text, containsVietnamese(text))
