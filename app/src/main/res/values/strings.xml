@@ -87,4 +87,12 @@
     <string name="align_off_right">Lệch phải</string>
     <string name="align_too_small">Lại gần</string>
     <string name="align_no_text">Chưa thấy chữ</string>    <string name="tutorial_grant_permission">Vui lòng cấp quyền để tiếp tục...</string>
+    <!-- Cài đặt & trợ năng (Hoàng) -->
+    <string name="speech_slower">Chậm hơn</string>
+    <string name="speech_faster">Nhanh hơn</string>
+    <string name="settings_detail">Mức chi tiết phản hồi</string>
+    <string name="detail_full">Đầy đủ</string>
+    <string name="detail_brief">Ngắn gọn</string>
+    <string name="settings_baseline">Chế độ so sánh (bản cũ)</string>
+    <string name="settings_baseline_hint">Chỉ dùng khi thử nghiệm A/B: tắt nhắc căn chỉnh, đọc liên tục, rung theo khung vật như VisionAid.</string>
 </resources>

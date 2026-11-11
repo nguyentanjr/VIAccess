@@ -13,5 +13,9 @@ fun createFeedbackCoordinator(
         override fun stop() = ttsManager.stopAll()
     },
     haptics = hapticManager,
-    defaultVietnamese = { settingsManager.useVietnamese }
+    defaultVietnamese = { settingsManager.useVietnamese },
+    maxGuidancePerMin = {
+        if (settingsManager.briefFeedback) FeedbackConfig.MAX_GUIDANCE_PER_MIN / 2
+        else FeedbackConfig.MAX_GUIDANCE_PER_MIN
+    }
 )

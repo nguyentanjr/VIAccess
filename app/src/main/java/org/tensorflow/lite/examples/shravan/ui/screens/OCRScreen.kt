@@ -43,6 +43,7 @@ fun OCRScreen(
     val context = androidx.compose.ui.platform.LocalContext.current
     val motionMonitor = remember { MotionMonitor(context) }
     val advisor = remember { AlignmentAdvisor() }
+    val reader = remember { ReadingController(feedback) }
     val adviceText = mapOf(
         AlignmentAdvice.DARK to stringResource(R.string.align_dark),
         AlignmentAdvice.SHAKY to stringResource(R.string.align_shaky),
@@ -121,7 +122,8 @@ fun OCRScreen(
                                     // Tự chụp: đạt hết điều kiện + chữ ổn định 3/5 frame (OCRManager) → rung ngắn → đọc.
                                     if (ocrManager?.shouldSpeak(text) == true) {
                                         feedback.vibrate(HapticPattern.SHORT, force = true)
-                                        feedback.say(text, Priority.STATE, key = "ocr:auto", isVietnamese = containsVietnamese(text))
+                                        // Đọc theo từng câu để dừng / tiếp / đọc lại đúng chỗ.
+                                        reader.start(text, containsVietnamese(text))
                                     }
                                 }
                                 else -> adviceText[advice]?.let {
@@ -187,11 +189,12 @@ fun OCRScreen(
                     onBack()
                 } else if (lowerResult.contains("đọc") || lowerResult.contains("read")) {
                     feedback.vibrate(force = true)
-                    readCurrent(feedback, currentText, noText)
+                    readCurrent(feedback, reader, currentText, noText)
                 }
             }
         } else {
             interactionsEnabled = false
+            reader.stop()
             voiceSessionId.value?.let {
                 voiceCommandManager.stopListening(it)
                 voiceSessionId.value = null
@@ -209,7 +212,7 @@ fun OCRScreen(
                 .clickable {
                     if (interactionsEnabled) {
                         feedback.vibrate(force = true)
-                        readCurrent(feedback, currentText, noText)
+                        readCurrent(feedback, reader, currentText, noText)
                     }
                 },
             contentAlignment = Alignment.BottomCenter
@@ -229,11 +232,11 @@ fun OCRScreen(
     }
 }
 
-private fun readCurrent(feedback: FeedbackCoordinator, text: String, noText: String) {
+private fun readCurrent(feedback: FeedbackCoordinator, reader: ReadingController, text: String, noText: String) {
     if (text.isBlank()) {
         feedback.say(noText, Priority.STATE, userInitiated = true)
     } else {
-        feedback.say(text, Priority.STATE, key = "ocr:manual", isVietnamese = containsVietnamese(text), userInitiated = true)
+        reader.start(text, containsVietnamese(text))
     }
 }
 

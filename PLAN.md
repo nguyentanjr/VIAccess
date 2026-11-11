@@ -216,17 +216,17 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 - [ ] `[S]` Đóng gói dữ liệu mẫu test (ảnh, mẫu OCR, CSV log) để nộp
 
 ### 9.4 Hoàng — TTS, accessibility, đánh giá người dùng (20)
-- [ ] `[M]` Khảo sát giải pháp liên quan (Seeing AI, Lookout, Envision, Be My Eyes, VisionAid)
-- [ ] `[M]` Wireframe 3 màn + kịch bản âm thanh (mọi câu nói, mẫu rung)
-- [ ] `[S]` Rút gọn onboarding + xin quyền
-- [ ] `[M]` `ReadingController`: tách câu, dừng / tiếp / đọc lại
-- [ ] `[M]` Accessibility: contentDescription, chữ ≥ 24sp, vùng chạm ≥ 48dp, tương phản ≥ 7:1
-- [ ] `[M]` Settings: tốc độ đọc, rung, flash, mức chi tiết phản hồi
-- [ ] `[M]` Kịch bản thử nghiệm, phiếu đồng ý, SUS / NASA-TLX
+- [x] `[M]` Khảo sát giải pháp liên quan (Seeing AI, Lookout, Envision, Be My Eyes, VisionAid)
+- [x] `[M]` Wireframe 3 màn + kịch bản âm thanh (mọi câu nói, mẫu rung)
+- [x] `[S]` Rút gọn onboarding + xin quyền
+- [x] `[M]` `ReadingController`: tách câu, dừng / tiếp / đọc lại
+- [x] `[M]` Accessibility: contentDescription, chữ ≥ 24sp, vùng chạm ≥ 48dp, tương phản ≥ 7:1
+- [x] `[M]` Settings: tốc độ đọc, rung, flash, mức chi tiết phản hồi
+- [x] `[M]` Kịch bản thử nghiệm, phiếu đồng ý, SUS / NASA-TLX
 - [ ] `[S]` Pilot 1 người, chỉnh kịch bản
-- [ ] `[M]` Script `eval/` tổng hợp chỉ số + Wilcoxon A/B
-- [ ] `[M]` Báo cáo: chương HCI (persona, khảo sát, thiết kế) + kết quả người dùng
-- [ ] `[S]` Slide thuyết trình
+- [x] `[M]` Script `eval/` tổng hợp chỉ số + Wilcoxon A/B
+- [ ] `[M]` Báo cáo: chương HCI (persona, khảo sát, thiết kế) + kết quả người dùng *(nháp: docs/bao_cao/chuong_hci.md, chờ số liệu)*
+- [ ] `[S]` Slide thuyết trình *(dàn ý: docs/bao_cao/slide_dan_y.md)*
 
 ### 9.5 Cả nhóm
 - [ ] Heuristic evaluation nội bộ (Nielsen) — tuần 5
@@ -266,3 +266,4 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 | 2026-11-10 | Tiến (Tân làm hộ) | ImageQuality, MotionMonitor, AlignmentAdvisor (luật 4.2) + 8 test, gắn vào OCRScreen + tự chụp, baselineMode T1, README |
 | 2026-11-11 | Hùng | Gộp main vào nhánh hung; sửa theo review: ngôn ngữ câu "Đang tìm", không báo "mất dấu" khi thấy lại vật, vẽ hộp từ kết quả persistence, so tên vật theo từ, MetricLogger dùng chung formatter |
 | 2026-11-11 | Tiến | Bỏ tiếng Anh: chỉ còn strings tiếng Việt, xoá coco.txt, useVietnamese luôn true, bỏ chọn ngôn ngữ ở Cài đặt và màn thiết lập; viết lại lời hướng dẫn |
+| 2026-11-11 | Hoàng | ReadingController (đọc theo câu, +5 test), Cài đặt mới (chữ 24sp, mức chi tiết, chế độ so sánh A/B), nhãn TalkBack cho nút, script eval/ (SUS, TLX, Wilcoxon, P/R/F1, CER/WER, độ trễ), tài liệu khảo sát / wireframe / kịch bản thử nghiệm |

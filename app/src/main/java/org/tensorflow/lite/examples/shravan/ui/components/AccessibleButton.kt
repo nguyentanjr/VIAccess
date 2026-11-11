@@ -9,6 +9,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.onClick
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.tensorflow.lite.examples.shravan.utils.HapticManager
@@ -33,6 +38,20 @@ fun AccessibleButton(
     Surface(
         modifier = modifier
             .padding(4.dp)
+            .heightIn(min = 48.dp)
+            // TalkBack: đọc như một nút, nhấn đúp để chọn (pointerInput không tự có ngữ nghĩa này).
+            .semantics(mergeDescendants = true) {
+                role = androidx.compose.ui.semantics.Role.Button
+                contentDescription = speakLabel
+                if (!enabled) disabled()
+                onClick(label = speakLabel) {
+                    if (enabled) {
+                        hapticManager.triggerHaptic()
+                        onClick()
+                    }
+                    true
+                }
+            }
             .pointerInput(enabled) {
                 if (enabled) {
                     detectTapGestures(

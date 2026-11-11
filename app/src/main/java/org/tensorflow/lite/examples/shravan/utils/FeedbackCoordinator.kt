@@ -26,8 +26,17 @@ class FeedbackCoordinator(
     private val speech: SpeechOutput,
     private val haptics: HapticOutput,
     private val defaultVietnamese: () -> Boolean,
-    private val clock: () -> Long = System::currentTimeMillis
+    private val clock: () -> Long = System::currentTimeMillis,
+    /** Số lời nhắc GUIDANCE tối đa mỗi phút; Cài đặt "Ngắn gọn" giảm một nửa. */
+    private val maxGuidancePerMin: () -> Int = { FeedbackConfig.MAX_GUIDANCE_PER_MIN }
 ) {
+    /** Bộ đọc theo câu đang hoạt động (OCR). Có nó thì dừng / tiếp / đọc lại chuyển sang nó. */
+    var reader: ReaderControl? = null
+
+    fun readerFinished(r: ReaderControl) {
+        if (reader === r) reader = null
+    }
+
     private var currentPriority: Priority? = null
     private val lastSaidAt = mutableMapOf<String, Long>()
     private val guidanceTimes = ArrayDeque<Long>()
@@ -99,7 +108,7 @@ class FeedbackCoordinator(
             while (guidanceTimes.isNotEmpty() && now - guidanceTimes.first() >= FeedbackConfig.GUIDANCE_WINDOW_MS) {
                 guidanceTimes.removeFirst()
             }
-            if (guidanceTimes.size >= FeedbackConfig.MAX_GUIDANCE_PER_MIN) return false
+            if (guidanceTimes.size >= maxGuidancePerMin()) return false
         }
 
         if (queue) return true
@@ -142,6 +151,7 @@ class FeedbackCoordinator(
      * @return true nếu đang có lời để dừng.
      */
     fun pauseSpeech(): Boolean {
+        reader?.takeIf { it.isReading && !it.isPaused }?.let { return it.pause() }
         val playing = current ?: return false
         paused.clear()
         paused.addLast(playing.copy(onDone = null))
@@ -152,6 +162,7 @@ class FeedbackCoordinator(
 
     /** Lệnh "tiếp": đọc lại phần đã dừng. @return false nếu không có gì đang dừng. */
     fun resumeSpeech(): Boolean {
+        reader?.takeIf { it.isReading && it.isPaused }?.let { return it.resume() }
         if (paused.isEmpty() || suspended) return false
         val items = paused.toList()
         paused.clear()
@@ -161,10 +172,11 @@ class FeedbackCoordinator(
         return true
     }
 
-    fun hasPausedSpeech(): Boolean = paused.isNotEmpty()
+    fun hasPausedSpeech(): Boolean = paused.isNotEmpty() || reader?.let { it.isReading && it.isPaused } == true || reader?.let { it.isReading && it.isPaused } == true
 
     /** Lệnh "đọc lại": đọc lại câu gần nhất. @return false nếu chưa nói gì. */
     fun repeatLast(): Boolean {
+        if (!suspended) reader?.let { if (it.repeat()) return true }
         val u = last ?: return false
         if (suspended) return false
         paused.clear()

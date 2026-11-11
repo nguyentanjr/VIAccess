@@ -1,0 +1,4 @@
+image,light,gt,pred
+cup_001.jpg,sang,cup,cup
+bottle_014.jpg,toi,bottle,none
+empty_003.jpg,sang,none,chair

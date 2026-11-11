@@ -60,6 +60,15 @@ class SettingsManager(context: Context) {
             prefs.edit().putBoolean("baseline_mode", value).apply()
         }
 
+    private var _briefFeedback = mutableStateOf(prefs.getBoolean("brief_feedback", false))
+    /** Mức chi tiết phản hồi: true = Ngắn gọn (ít lời nhắc căn chỉnh hơn). */
+    var briefFeedback: Boolean
+        get() = _briefFeedback.value
+        set(value) {
+            _briefFeedback.value = value
+            prefs.edit().putBoolean("brief_feedback", value).apply()
+        }
+
     /** App chỉ hỗ trợ tiếng Việt (PLAN 1.3). Giữ thuộc tính để code cũ đọc được, luôn là true. */
     val useVietnamese: Boolean get() = true
 
@@ -78,6 +87,7 @@ class SettingsManager(context: Context) {
         speechRate = 1.0f
         hapticsEnabled = true
         baselineMode = false
+        briefFeedback = false
         flashMode = "auto"
     }
 }

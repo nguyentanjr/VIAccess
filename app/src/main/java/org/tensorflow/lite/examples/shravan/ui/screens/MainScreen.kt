@@ -433,7 +433,8 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
                                 onReset = onReset, 
                                 isActive = isActive,
                                 resetCount = resetCount,
-                                onResetClick = { resetCount++ }
+                                onResetClick = { resetCount++ },
+                                feedback = feedback
                             )
                         }
                     }
