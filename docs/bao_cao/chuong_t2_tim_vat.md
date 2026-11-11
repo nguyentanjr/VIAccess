@@ -44,3 +44,5 @@ Không có luật 3 frame và không có trạng thái: hễ thấy vật trong 
 - Chai nhựa trong suốt và điều khiển nhỏ khó nhận diện `[xác nhận bằng số liệu]`.
 - Diện tích khung vật chỉ phản ánh khoảng cách một cách tương đối (vật to ở xa có thể giống vật nhỏ ở gần).
 - Không tìm được vật ngoài COCO như chìa khóa, ví.
+- Ví dụ quan sát trên máy ảo (2026-11-11): chuột gaming cầm trên tay bị YOLOv5s nhận là "điều khiển từ xa" (tới 0.79), không lần nào ra "chuột" trong 409 lượt — ảnh "mouse" của COCO chủ yếu là chuột nằm trên bàn, chụp từ trên xuống. Nhóm giữ nguyên (không gộp chuột với điều khiển) để tránh báo nhầm; cách khắc phục là huấn luyện thêm, ngoài phạm vi.
+- Gỡ lỗi: `adb shell setprop log.tag.VIA_RAW DEBUG` rồi xem `adb logcat -s VIA_RAW` để thấy 3 kết quả thô cao nhất mỗi lượt.

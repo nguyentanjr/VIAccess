@@ -147,6 +147,11 @@ class YoloAnalyzer(
                     latencyMs = (inferenceFinishedAtNs - inferenceStartedAtNs) / 1_000_000L,
                     baselineMode = settingsManager.baselineMode
                 )
+                if (android.util.Log.isLoggable("VIA_RAW", android.util.Log.DEBUG)) {
+                    // Gỡ lỗi: 3 kết quả thô cao nhất trước khi lọc (bật bằng: adb shell setprop log.tag.VIA_RAW DEBUG).
+                    android.util.Log.d("VIA_RAW", results.sortedByDescending { it.confidence }.take(3)
+                        .joinToString(" ") { "${it.detectedClass}:${"%.2f".format(java.util.Locale.ROOT, it.confidence)}" })
+                }
                 val baseFiltered = results.filter { it.confidence > FeedbackConfig.YOLO_MIN_CONFIDENCE }
                 
                 // Totally Blind Optimization: dynamic debounce
