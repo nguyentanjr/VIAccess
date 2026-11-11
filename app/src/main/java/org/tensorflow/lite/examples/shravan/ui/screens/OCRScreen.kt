@@ -61,6 +61,51 @@ fun OCRScreen(
         onDispose { motionMonitor.stop() }
     }
 
+    // --- QR / mã vạch (ML Kit Barcode, chạy trên máy) ---
+    val barcodeScanner = remember { com.google.mlkit.vision.barcode.BarcodeScanning.getClient() }
+    DisposableEffect(barcodeScanner) { onDispose { barcodeScanner.close() } }
+    val lastBarcode = remember { mutableMapOf<String, Long>() }
+    val qrStrings = mapOf(
+        "text" to stringResource(R.string.qr_text),
+        "link" to stringResource(R.string.qr_link),
+        "wifi" to stringResource(R.string.qr_wifi),
+        "wifiOpen" to stringResource(R.string.qr_wifi_open),
+        "phone" to stringResource(R.string.qr_phone),
+        "vietqr" to stringResource(R.string.qr_vietqr),
+        "vqName" to stringResource(R.string.qr_vietqr_name),
+        "vqAcc" to stringResource(R.string.qr_vietqr_account),
+        "vqAmt" to stringResource(R.string.qr_vietqr_amount),
+        "product" to stringResource(R.string.barcode_product)
+    )
+    fun announceBarcode(code: com.google.mlkit.vision.barcode.common.Barcode) {
+        val raw = code.rawValue ?: return
+        val now = android.os.SystemClock.elapsedRealtime()
+        if (now - (lastBarcode[raw] ?: -FeedbackConfig.BARCODE_REPEAT_MS) < FeedbackConfig.BARCODE_REPEAT_MS) return
+        lastBarcode[raw] = now
+        val product = code.format in setOf(
+            com.google.mlkit.vision.barcode.common.Barcode.FORMAT_EAN_13,
+            com.google.mlkit.vision.barcode.common.Barcode.FORMAT_EAN_8,
+            com.google.mlkit.vision.barcode.common.Barcode.FORMAT_UPC_A,
+            com.google.mlkit.vision.barcode.common.Barcode.FORMAT_UPC_E
+        )
+        fun s(k: String, vararg a: Any) = String.format(qrStrings.getValue(k), *a)
+        val text = when (val info = BarcodeInfo.parse(raw, product)) {
+            is BarcodeInfo.Link -> s("link", info.host)
+            is BarcodeInfo.Wifi -> if (info.password != null) s("wifi", info.ssid, info.password) else s("wifiOpen", info.ssid)
+            is BarcodeInfo.Phone -> s("phone", info.number)
+            is BarcodeInfo.Product -> s("product", info.digits.toCharArray().joinToString(" "))
+            is BarcodeInfo.VietQr -> listOfNotNull(
+                qrStrings.getValue("vietqr"),
+                info.name?.let { s("vqName", it) },
+                info.account?.let { s("vqAcc", it.toCharArray().joinToString(" ")) },
+                info.amount?.let { s("vqAmt", it) }
+            ).joinToString(", ")
+            is BarcodeInfo.Text -> s("text", info.text)
+        }
+        feedback.vibrate(HapticPattern.SHORT, force = true)
+        feedback.say(text, Priority.STATE, key = "barcode:$raw", userInitiated = true)
+    }
+
     LaunchedEffect(isActive, recognizer) {
         if (isActive) {
             advisor.reset()
@@ -86,7 +131,10 @@ fun OCRScreen(
                         imageProxy.height to imageProxy.width
                     }
                     val inputImage = InputImage.fromMediaImage(mediaImage, rotation)
-                    rec.process(inputImage)
+                    // QR / mã vạch chạy song song với đọc chữ trên cùng khung hình.
+                    val barcodeTask = barcodeScanner.process(inputImage)
+                        .addOnSuccessListener { codes -> codes.firstOrNull()?.let { announceBarcode(it) } }
+                    val textTask = rec.process(inputImage)
                         .addOnSuccessListener { visionText ->
                             val text = visionText.text
                             if (text.isNotBlank()) currentText = text
@@ -134,6 +182,7 @@ fun OCRScreen(
                         .addOnFailureListener { e ->
                             android.util.Log.e("OCRScreen", "OCR Failed", e)
                         }
+                    com.google.android.gms.tasks.Tasks.whenAllComplete(textTask, barcodeTask)
                         .addOnCompleteListener {
                             isProcessing = false
                             imageProxy.close()

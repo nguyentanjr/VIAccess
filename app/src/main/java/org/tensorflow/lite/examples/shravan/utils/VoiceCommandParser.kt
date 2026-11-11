@@ -4,7 +4,14 @@ import java.text.Normalizer
 import java.util.Locale
 
 /** 5 lệnh giọng nói theo PLAN.md mục 4.4 (+ "giúp đỡ" và "cài đặt" giữ lại từ VisionAid). */
-enum class VoiceCommand { READ_TEXT, FIND, PAUSE, RESUME, REPEAT, BACK, HELP, SETTINGS, UNKNOWN }
+enum class VoiceCommand {
+    READ_TEXT, FIND, PAUSE, RESUME, REPEAT, BACK, HELP, SETTINGS,
+    /** Câu tiếp theo / câu trước khi đang đọc văn bản (đề xuất đề tài). */
+    NEXT_SENTENCE, PREVIOUS_SENTENCE,
+    /** "Xung quanh có gì": đọc một lần tối đa 3 vật. */
+    EXPLORE,
+    UNKNOWN
+}
 
 /**
  * Nhận diện lệnh từ câu nói. So khớp theo từ nguyên vẹn sau khi bỏ dấu,
@@ -16,6 +23,10 @@ object VoiceCommandParser {
 
     // Thứ tự quan trọng: cụm dài/cụ thể trước ("đọc lại" trước "đọc chữ" / "đọc").
     private val rules: List<Pair<VoiceCommand, List<String>>> = listOf(
+        // "câu tiếp" / "câu trước" phải đứng trước "tiếp" (RESUME) và "đọc lại".
+        VoiceCommand.NEXT_SENTENCE to listOf("cau tiep", "cau sau", "cau tiep theo", "tiep theo", "next"),
+        VoiceCommand.PREVIOUS_SENTENCE to listOf("cau truoc", "cau truoc do", "previous"),
+        VoiceCommand.EXPLORE to listOf("xung quanh", "kham pha", "co gi", "truoc mat", "explore", "around"),
         VoiceCommand.REPEAT to listOf("doc lai", "lap lai", "noi lai", "repeat", "read again"),
         VoiceCommand.BACK to listOf("quay lai", "tro lai", "go back", "back"),
         VoiceCommand.PAUSE to listOf("dung", "tam dung", "im", "stop", "pause"),

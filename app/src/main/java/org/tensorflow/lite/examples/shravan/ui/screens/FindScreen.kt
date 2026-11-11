@@ -88,7 +88,8 @@ fun FindScreen(
     isActive: Boolean = true,
     yoloAnalyzer: YoloAnalyzer? = null,
     initialTarget: FindTarget? = null,
-    onInitialTargetHandled: () -> Unit = {}
+    onInitialTargetHandled: () -> Unit = {},
+    onExplore: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val languageContext = remember(context, settingsManager.useVietnamese) {
@@ -364,6 +365,14 @@ fun FindScreen(
                 fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                 modifier = Modifier.semantics { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite }
             )
+            Button(
+                onClick = onExplore,
+                modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD600), contentColor = Color.Black)
+            ) {
+                Text(languageContext.getString(R.string.explore_button), fontSize = 22.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+            }
         }
 
         Column(

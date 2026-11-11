@@ -71,7 +71,7 @@ class ReadingController(private val feedback: FeedbackCoordinator) : ReaderContr
         return true
     }
 
-    fun next(): Boolean {
+    override fun next(): Boolean {
         if (index + 1 >= sentences.size) return false
         index++
         isPaused = false
@@ -80,7 +80,7 @@ class ReadingController(private val feedback: FeedbackCoordinator) : ReaderContr
         return true
     }
 
-    fun previous(): Boolean {
+    override fun previous(): Boolean {
         if (sentences.isEmpty()) return false
         index = (index - 1).coerceAtLeast(0)
         isPaused = false
@@ -134,4 +134,6 @@ interface ReaderControl {
     fun pause(): Boolean
     fun resume(): Boolean
     fun repeat(): Boolean
+    fun next(): Boolean
+    fun previous(): Boolean
 }

@@ -23,6 +23,17 @@ class VoiceCommandParserTest {
     }
 
     @Test
+    fun sentenceNavigationAndExplore() {
+        assertEquals(VoiceCommand.NEXT_SENTENCE, cmd("câu tiếp"))
+        assertEquals(VoiceCommand.NEXT_SENTENCE, cmd("đọc câu tiếp theo"))
+        assertEquals(VoiceCommand.PREVIOUS_SENTENCE, cmd("câu trước"))
+        assertEquals(VoiceCommand.RESUME, cmd("tiếp"))
+        assertEquals(VoiceCommand.EXPLORE, cmd("xung quanh có gì"))
+        assertEquals(VoiceCommand.EXPLORE, cmd("khám phá"))
+        assertEquals(VoiceCommand.EXPLORE, cmd("trước mặt có gì"))
+    }
+
+    @Test
     fun specificPhrasesWinOverShorterOnes() {
         // "đọc lại" chứa "đọc" nhưng phải là đọc lại, không phải vào màn đọc chữ.
         assertEquals(VoiceCommand.REPEAT, cmd("đọc lại"))

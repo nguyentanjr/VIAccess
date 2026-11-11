@@ -260,6 +260,8 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 
 - **2026-11-11 – Mở rộng vật tìm từ 6 lên 17** (Tân đề xuất): thêm 11 lớp COCO có sẵn, không cần huấn luyện lại. Đánh giá P/R/F1 vẫn chỉ trên 6 vật chính để giữ khối lượng; 11 vật mới chỉ kiểm thử chức năng. Màn Tìm đổi sang lưới 3 cột cuộn được.
 
+- **2026-11-11 – Bổ sung theo bản đề xuất đã nộp** (`2627I_INT2041_1 Nhóm 13 .pdf`): (1) *Khám phá xung quanh* theo yêu cầu — nói "xung quanh có gì" hoặc chạm nút, đọc **một lần** tối đa 3 vật kèm hướng (khác Explore cũ đọc liên tục); (2) *câu tiếp / câu trước* bằng giọng nói và vuốt trái / phải khi đang đọc. Thêm (3) *đọc QR / mã vạch* bằng ML Kit Barcode trên máy (link, wifi, số điện thoại, VietQR, mã vạch sản phẩm đọc dãy số). Đề xuất của Tân, cần nhóm đồng ý.
+
 ## 12. Nhật ký
 | Ngày | Ai | Ghi chú |
 |---|---|---|
@@ -273,3 +275,4 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 | 2026-11-11 | Tân | Soạn bản phạm vi gửi cô, checklist kiểm thử 6.1 (+ heuristic), nháp chương kiến trúc & luồng |
 | 2026-11-11 | Tân | Mở rộng Tìm vật lên 17 vật (FindTarget + lưới 3 cột), +2 test (so khớp lệnh, khớp nhãn coco_vi) |
 | 2026-11-11 | Tân | Tăng nhận diện: zoom 1.0 ở màn Tìm, letterbox giữ tỉ lệ ảnh, YOLO 4 luồng + chạy mỗi 2 frame, ngưỡng 0.4 cho vật khó (chai, điều khiển, chuột, kéo, thìa, bàn chải); +3 test. Máy ảo: suy luận TB ~170 ms |
+| 2026-11-11 | Tân | Khám phá xung quanh (ExploreSummarizer), lệnh + vuốt câu tiếp / câu trước, đọc QR / mã vạch + VietQR (BarcodeInfo); +7 test |

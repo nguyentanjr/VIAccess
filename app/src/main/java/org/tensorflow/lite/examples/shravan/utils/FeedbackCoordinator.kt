@@ -172,6 +172,10 @@ class FeedbackCoordinator(
         return true
     }
 
+    /** Câu tiếp theo / câu trước của văn bản đang đọc. @return false nếu không có bộ đọc. */
+    fun nextSentence(): Boolean = !suspended && reader?.next() == true
+    fun previousSentence(): Boolean = !suspended && reader?.previous() == true
+
     fun hasPausedSpeech(): Boolean = paused.isNotEmpty() || reader?.let { it.isReading && it.isPaused } == true || reader?.let { it.isReading && it.isPaused } == true
 
     /** Lệnh "đọc lại": đọc lại câu gần nhất. @return false nếu chưa nói gì. */

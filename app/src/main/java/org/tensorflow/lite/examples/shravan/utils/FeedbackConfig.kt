@@ -79,6 +79,14 @@ object FeedbackConfig {
     /** Báo lỗi mạng tối đa một lần trong khoảng này. */
     const val VOICE_NETWORK_ALERT_COOLDOWN_MS = 60_000L
 
+    // --- Khám phá xung quanh (đề xuất đề tài) ---
+    const val EXPLORE_MAX_OBJECTS = 3
+    const val EXPLORE_MIN_CONFIDENCE = 0.5f
+
+    // --- QR / mã vạch ---
+    /** Cùng một mã không đọc lại trong khoảng này. */
+    const val BARCODE_REPEAT_MS = 10_000L
+
     // --- Rung ---
     const val HAPTIC_SHORT_MS = 50L
     const val HAPTIC_DEFAULT_MS = 100L

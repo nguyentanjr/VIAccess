@@ -35,6 +35,12 @@ class YoloAnalyzer(
     /** Gọi một lần (trên luồng phân tích ảnh) khi không nạp được mô hình YOLO. */
     var onModelError: ((Throwable) -> Unit)? = null
     @Volatile private var modelFailed = false
+    @Volatile private var pendingSnapshot: ((List<org.tensorflow.lite.examples.shravan.utils.SeenObject>) -> Unit)? = null
+
+    /** Lần nhận diện kế tiếp gọi [callback] (trên luồng phân tích ảnh) với mọi vật thấy được. */
+    fun requestSnapshot(callback: (List<org.tensorflow.lite.examples.shravan.utils.SeenObject>) -> Unit) {
+        pendingSnapshot = callback
+    }
 
     private var currentDetector: YoloV5Classifier? = null
     private var currentLabels: List<String>? = null
@@ -162,6 +168,18 @@ class YoloAnalyzer(
                 }
 
                 val currentLabelsList = labels
+                // "Khám phá": trả một lần mọi vật thấy được (trước khi lọc theo vật đang tìm).
+                pendingSnapshot?.let { cb ->
+                    pendingSnapshot = null
+                    val size = detector.inputSize.toFloat()
+                    cb(baseFiltered.mapNotNull { r ->
+                        val loc = r.location ?: return@mapNotNull null
+                        val label = if (r.detectedClass < currentLabelsList.size) currentLabelsList[r.detectedClass] else r.title
+                        org.tensorflow.lite.examples.shravan.utils.SeenObject(
+                            label, r.confidence, ((loc.left + loc.right) / 2f / size).coerceIn(0f, 1f)
+                        )
+                    })
+                }
                 val currentFiltered = if (allowedClasses != null) {
                     baseFiltered.filter { result ->
                         val title = if (result.detectedClass < currentLabelsList.size) currentLabelsList[result.detectedClass] else result.title

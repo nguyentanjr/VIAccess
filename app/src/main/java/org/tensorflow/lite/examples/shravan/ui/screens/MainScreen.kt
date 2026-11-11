@@ -127,6 +127,9 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
     val sPaused = stringResource(R.string.voice_paused)
     val sNothingPaused = stringResource(R.string.voice_nothing_paused)
     val sNothingToRepeat = stringResource(R.string.voice_nothing_to_repeat)
+    val sNoSentence = stringResource(R.string.voice_no_sentence)
+    val sExploreNothing = stringResource(R.string.explore_nothing)
+    val sExploreLooking = stringResource(R.string.explore_looking)
     val sAlreadyHome = stringResource(R.string.voice_already_home)
     val sNetwork = stringResource(R.string.error_network)
     val sVoiceUnavailable = stringResource(R.string.error_voice_unavailable)
@@ -152,6 +155,30 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
     fun repeatLast() {
         if (!feedback.repeatLast()) feedback.say(sNothingToRepeat, Priority.STATE, userInitiated = true)
         hasPaused = false
+    }
+
+    // --- Khám phá xung quanh: chụp kết quả YOLO một lần, đọc tối đa 3 vật kèm hướng ---
+    val mainHandler = remember { android.os.Handler(android.os.Looper.getMainLooper()) }
+    var exploreToken by remember { mutableIntStateOf(0) }
+    fun explore() {
+        if (currentPage != PAGE_FIND) currentPage = PAGE_FIND // camera chuyển sang YOLO
+        val token = ++exploreToken
+        feedback.say(sExploreLooking, Priority.STATE, userInitiated = true)
+        yoloAnalyzer.requestSnapshot { seen ->
+            val text = ExploreSummarizer.summarize(seen)
+            mainHandler.post {
+                if (token != exploreToken) return@post
+                exploreToken++
+                feedback.say(text ?: sExploreNothing, Priority.STATE, userInitiated = true, queue = true)
+            }
+        }
+        // Không có frame nào (camera chưa sẵn sàng) trong 4 s → báo không thấy.
+        mainHandler.postDelayed({
+            if (token == exploreToken) {
+                exploreToken++
+                feedback.say(sExploreNothing, Priority.STATE, userInitiated = true)
+            }
+        }, 4000L)
     }
 
     /** @return true nếu lệnh đã xử lý ở đây; false để màn hình con xử lý tiếp (vd "tìm cốc", "đọc"). */
@@ -196,6 +223,15 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
             feedback.vibrate(force = true)
             true
         }
+        VoiceCommand.NEXT_SENTENCE -> {
+            if (!feedback.nextSentence()) feedback.say(sNoSentence, Priority.STATE, userInitiated = true)
+            true
+        }
+        VoiceCommand.PREVIOUS_SENTENCE -> {
+            if (!feedback.previousSentence()) feedback.say(sNoSentence, Priority.STATE, userInitiated = true)
+            true
+        }
+        VoiceCommand.EXPLORE -> { explore(); true }
         VoiceCommand.UNKNOWN -> false
     }
 
@@ -347,7 +383,12 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
                         onHorizontalDrag = { change, dragAmount ->
                             change.consume()
                             totalDrag += dragAmount
-                            if (java.lang.Math.abs(totalDrag) > swipeThreshold) {
+                            if (java.lang.Math.abs(totalDrag) > swipeThreshold && currentPage == PAGE_OCR && feedback.reader?.isReading == true) {
+                                // Đang đọc văn bản: vuốt trái = câu tiếp, vuốt phải = câu trước (thay cho chuyển trang).
+                                if (totalDrag < 0) feedback.nextSentence() else feedback.previousSentence()
+                                feedback.vibrate(HapticPattern.SHORT, force = true)
+                                totalDrag = 0f
+                            } else if (java.lang.Math.abs(totalDrag) > swipeThreshold) {
                                 val targetPage = if (totalDrag < 0) {
                                     (currentPage + 1).coerceAtMost(screens.lastIndex)
                                 } else {
@@ -414,7 +455,8 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
                             isActive = isActive,
                             yoloAnalyzer = yoloAnalyzer,
                             initialTarget = pendingFindTarget,
-                            onInitialTargetHandled = { pendingFindTarget = null }
+                            onInitialTargetHandled = { pendingFindTarget = null },
+                            onExplore = { explore() }
                         )
                         PAGE_OCR -> OCRScreen(
                             onBack = { currentPage = PAGE_FIND },
