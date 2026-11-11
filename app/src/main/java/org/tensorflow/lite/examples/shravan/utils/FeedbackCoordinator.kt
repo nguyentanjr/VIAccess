@@ -47,7 +47,7 @@ class FeedbackCoordinator(
         userInitiated: Boolean = false,
         onDone: (() -> Unit)? = null
     ): Boolean {
-        if (text.isBlank()) {
+        if (text.isBlank() || suspended) {
             onDone?.invoke()
             return false
         }
@@ -68,14 +68,28 @@ class FeedbackCoordinator(
             // Ngắt lời đang đọc: bỏ luôn các lời đang xếp hàng.
             pending.clear()
             draining = false
-            currentPriority = priority
-            speech.speak(text, vi) {
+            play(Utterance(text, vi, priority, null)) {
                 currentPriority = null
+                current = null
                 onDone?.invoke()
                 if (pending.isNotEmpty() && !draining) drainNext()
             }
         }
         return true
+    }
+
+    /** Lời đang đọc và lời đọc gần nhất (cho "dừng" / "đọc lại"). */
+    private var current: Utterance? = null
+    private var last: Utterance? = null
+    /** Phần còn lại khi người dùng nói "dừng": lời đang đọc + hàng đợi. */
+    private val paused = ArrayDeque<Utterance>()
+    private var suspended = false
+
+    private fun play(u: Utterance, onFinished: () -> Unit) {
+        currentPriority = u.priority
+        current = u
+        last = u
+        speech.speak(u.text, u.vi, onFinished)
     }
 
     private fun isAllowed(key: String, priority: Priority, now: Long, queue: Boolean): Boolean {
@@ -104,11 +118,11 @@ class FeedbackCoordinator(
         if (next == null) {
             draining = false
             currentPriority = null
+            current = null
             return
         }
         draining = true
-        currentPriority = next.priority
-        speech.speak(next.text, next.vi) {
+        play(next) {
             next.onDone?.invoke()
             drainNext()
         }
@@ -119,11 +133,62 @@ class FeedbackCoordinator(
         pending.clear()
         draining = false
         currentPriority = null
+        current = null
         speech.stop()
+    }
+
+    /**
+     * Lệnh "dừng": ngắt lời đang đọc nhưng nhớ lại phần còn dở để "tiếp" đọc tiếp.
+     * @return true nếu đang có lời để dừng.
+     */
+    fun pauseSpeech(): Boolean {
+        val playing = current ?: return false
+        paused.clear()
+        paused.addLast(playing.copy(onDone = null))
+        pending.forEach { paused.addLast(it.copy(onDone = null)) }
+        stopSpeech()
+        return true
+    }
+
+    /** Lệnh "tiếp": đọc lại phần đã dừng. @return false nếu không có gì đang dừng. */
+    fun resumeSpeech(): Boolean {
+        if (paused.isEmpty() || suspended) return false
+        val items = paused.toList()
+        paused.clear()
+        stopSpeech()
+        items.forEach { pending.addLast(it) }
+        drainNext()
+        return true
+    }
+
+    fun hasPausedSpeech(): Boolean = paused.isNotEmpty()
+
+    /** Lệnh "đọc lại": đọc lại câu gần nhất. @return false nếu chưa nói gì. */
+    fun repeatLast(): Boolean {
+        val u = last ?: return false
+        if (suspended) return false
+        paused.clear()
+        stopSpeech()
+        pending.addLast(u.copy(onDone = null))
+        drainNext()
+        return true
+    }
+
+    /**
+     * App chạy nền: dừng lời nói, bỏ mọi lời nói / rung mới cho đến khi gọi lại với false.
+     * Vòng lặp rung của các màn hình vẫn chạy nhưng không phát ra gì.
+     */
+    fun setSuspended(value: Boolean) {
+        suspended = value
+        if (value) {
+            paused.clear()
+            stopSpeech()
+        }
     }
 
     /** @param force rung kể cả khi đang nói (dùng cho xác nhận hành động). */
     fun vibrate(pattern: HapticPattern = HapticPattern.DEFAULT, force: Boolean = false): Boolean {
+        if (suspended) return false
         if (!force && speech.isSpeaking()) return false
         haptics.vibrate(pattern)
         return true

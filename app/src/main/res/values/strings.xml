@@ -61,4 +61,37 @@
     <string name="status_location">You are currently in %s</string>
     <string name="tutorial_text">Welcome to the tutorial. This app has 5 main screens: Explore to detect objects around you, Find to locate specific items, OCR to read text, Settings to configure preferences, and History to view past detections. You can swipe left and right, or say the screen name to navigate. Click the screen to end this tutorial and grant necessary permissions.</string>
     <string name="tutorial_skip_instruction">Playing tutorial...\nClick screen to continue.</string>
-</resources>
+    <!-- Voice commands & errors (Tan) -->
+    <string name="nav_pause">Pause</string>
+    <string name="nav_resume">Resume</string>
+    <string name="nav_repeat">Repeat</string>
+    <string name="voice_not_understood">Sorry, please say that again</string>
+    <string name="voice_use_touch">No command recognised. Use the large buttons at the bottom: Find, Read text, Pause, Repeat, Settings.</string>
+    <string name="voice_help_commands">You are on %s. Commands: read text, find plus an object, pause, resume, repeat, go back.</string>
+    <string name="voice_paused">Paused</string>
+    <string name="voice_nothing_paused">Nothing to resume</string>
+    <string name="voice_nothing_to_repeat">Nothing to repeat yet</string>
+    <string name="voice_already_home">You are on the find screen</string>
+    <string name="error_network">No network connection, voice commands are unavailable. Use the touch buttons at the bottom.</string>
+    <string name="error_voice_unavailable">Speech recognition is not available on this device. Use the touch buttons at the bottom.</string>
+    <string name="error_mic_permission">Microphone permission is missing, voice commands are unavailable. Use the touch buttons.</string>
+    <string name="error_model">The object detection model failed to load. Finding objects is unavailable.</string>
+    <string name="error_tts_missing_title">Vietnamese voice is not installed</string>
+    <string name="error_tts_missing_body">The app needs a Vietnamese text-to-speech voice. Please install it in the Text-to-speech settings.</string>
+    <string name="error_tts_install">Install voice</string>
+    <string name="error_tts_init">Text-to-speech could not start. Please check the device text-to-speech settings.</string>
+    <string name="action_later">Later</string>
+    <string name="permission_title">Camera and microphone needed</string>
+    <string name="permission_body">The app needs the camera to see text and objects, and the microphone to hear commands. Tap the large button below to grant them.</string>
+    <string name="permission_grant">Grant permission</string>
+    <string name="permission_open_settings">Open app settings</string>
+    <string name="permission_denied_forever">Permission was denied. Tap the button to open app settings and allow camera and microphone.</string>
+<!-- Camera alignment for OCR (PLAN 4.2) -->
+    <string name="align_dark">Low light</string>
+    <string name="align_shaky">Hold the phone still</string>
+    <string name="align_blurry">Image is blurry, hold still</string>
+    <string name="align_too_close">Move the phone back</string>
+    <string name="align_off_left">Text is to the left</string>
+    <string name="align_off_right">Text is to the right</string>
+    <string name="align_too_small">Move closer</string>
+    <string name="align_no_text">No text yet</string></resources>

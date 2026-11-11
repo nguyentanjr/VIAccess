@@ -31,6 +31,8 @@ object FeedbackConfig {
     const val TEXT_MIN_AREA = 0.10f
     const val NO_TEXT_FIRST_PROMPT_MS = 5000L
     const val NO_TEXT_REPEAT_MS = 10_000L
+    /** Lấy mẫu mỗi N điểm ảnh khi đo độ sáng / độ nét (ngưỡng Laplacian phụ thuộc giá trị này). */
+    const val QUALITY_SAMPLE_STEP = 4
 
     // --- Ổn định OCR (kế thừa OCRManager) ---
     const val OCR_MIN_TEXT_LENGTH = 3
@@ -62,6 +64,16 @@ object FeedbackConfig {
     const val HAPTIC_INTERVAL_FAR_MS = 1000L
     const val HAPTIC_INTERVAL_NEAR_MS = 250L
     const val METRIC_MAX_ROWS = 20_000
+
+    // --- Lệnh giọng nói & lỗi (PLAN 4.4) ---
+    /** Không nhận ra lệnh liên tiếp bao nhiêu lần thì nhắc dùng nút chạm. */
+    const val VOICE_MAX_FAILURES = 3
+    /** Bỏ qua cùng một lệnh lặp lại trong khoảng này (kết quả tạm + kết quả cuối của cùng một câu). */
+    const val VOICE_COMMAND_DEDUP_MS = 1500L
+    /** Lỗi mạng của SpeechRecognizer: chờ khoảng này rồi nghe lại. */
+    const val VOICE_NETWORK_RETRY_MS = 5000L
+    /** Báo lỗi mạng tối đa một lần trong khoảng này. */
+    const val VOICE_NETWORK_ALERT_COOLDOWN_MS = 60_000L
 
     // --- Rung ---
     const val HAPTIC_SHORT_MS = 50L

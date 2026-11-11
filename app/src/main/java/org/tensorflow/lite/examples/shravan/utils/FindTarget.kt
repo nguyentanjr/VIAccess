@@ -18,11 +18,12 @@ enum class FindTarget(
 
     companion object {
         fun fromCommand(command: String): FindTarget? {
-            val normalized = normalize(command)
-            if (!normalized.contains("tim") && !normalized.contains("find")) return null
+            // So theo từ nguyên vẹn: "nghe" không khớp "ghe", "lý do" không khớp "ly"... vẫn khớp, chấp nhận.
+            val words = " ${normalize(command)} "
+            if (!words.contains(" tim ") && !words.contains(" find ")) return null
 
             return entries.firstOrNull { target ->
-                target.aliases.any { alias -> normalize(alias).let(normalized::contains) }
+                target.aliases.any { alias -> words.contains(" ${normalize(alias)} ") }
             }
         }
 
@@ -31,6 +32,7 @@ enum class FindTarget(
                 .replace("\\p{Mn}+".toRegex(), "")
                 .replace('đ', 'd')
                 .replace('Đ', 'd')
+                .replace("[^a-z0-9 ]".toRegex(), " ")
                 .replace(Regex("\\s+"), " ")
                 .trim()
     }

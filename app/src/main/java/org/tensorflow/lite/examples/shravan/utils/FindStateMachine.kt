@@ -58,11 +58,12 @@ class FindStateMachine {
         ) {
             val lastSeen = lastSeenAtMs
             if (lastSeen != null && nowMs - lastSeen > FeedbackConfig.FIND_LOST_MS) {
-                state = FindState.LOST
+                // Có khoảng trống không frame nào rồi lại thấy vật: không báo "mất dấu"
+                // (vật đang ở trước camera), chỉ xác nhận lại từ đầu, frame này tính là frame 1.
+                state = FindState.SEARCHING
                 candidateFrames = 0
                 lastSeenAtMs = null
                 centeredSinceMs = null
-                return FindFrameResult(state, FindEvent.LOST)
             }
         }
 
@@ -151,6 +152,8 @@ class FindStateMachine {
             )
         }
 
-        return FindFrameResult(state, observation = observation, hapticIntervalMs = interval)
+        return FindFrameResult(
+            state, direction = direction, observation = observation, hapticIntervalMs = interval
+        )
     }
 }

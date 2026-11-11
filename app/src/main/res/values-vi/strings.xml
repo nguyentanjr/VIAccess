@@ -61,4 +61,37 @@
     <string name="status_location">Bạn đang ở %s</string>
     <string name="tutorial_text">Chào mừng bạn đến với hướng dẫn. Ứng dụng này có 5 màn hình chính: Khám phá để nhận diện vật thể xung quanh, Tìm kiếm để tìm vật thể cụ thể, Đọc văn bản để đọc chữ, Cài đặt để tùy chỉnh, và Lịch sử để xem lại. Bạn có thể vuốt trái phải, hoặc đọc tên màn hình để chuyển. Nhấn vào màn hình để kết thúc và cấp quyền.</string>
     <string name="tutorial_skip_instruction">Đang phát hướng dẫn...\nNhấn vào màn hình để chuyển tiếp.</string>
-</resources>
+    <!-- Lệnh giọng nói & lỗi (Tân) -->
+    <string name="nav_pause">Dừng</string>
+    <string name="nav_resume">Tiếp</string>
+    <string name="nav_repeat">Đọc lại</string>
+    <string name="voice_not_understood">Không hiểu, hãy nói lại</string>
+    <string name="voice_use_touch">Chưa nhận được lệnh. Hãy dùng các nút lớn ở cuối màn hình: Tìm, Đọc chữ, Dừng, Đọc lại, Cài đặt.</string>
+    <string name="voice_help_commands">Bạn đang ở %s. Các lệnh: đọc chữ, tìm cộng tên vật, dừng, tiếp, đọc lại, quay lại.</string>
+    <string name="voice_paused">Đã dừng</string>
+    <string name="voice_nothing_paused">Không có gì để đọc tiếp</string>
+    <string name="voice_nothing_to_repeat">Chưa có gì để đọc lại</string>
+    <string name="voice_already_home">Bạn đang ở màn tìm vật</string>
+    <string name="error_network">Mất kết nối mạng nên chưa nghe được lệnh giọng nói. Hãy dùng nút chạm ở cuối màn hình.</string>
+    <string name="error_voice_unavailable">Máy không hỗ trợ nhận giọng nói. Hãy dùng nút chạm ở cuối màn hình.</string>
+    <string name="error_mic_permission">Chưa có quyền dùng micro nên không nghe được lệnh. Hãy dùng nút chạm.</string>
+    <string name="error_model">Không tải được mô hình nhận diện vật. Chức năng tìm vật tạm thời không dùng được.</string>
+    <string name="error_tts_missing_title">Máy chưa có giọng đọc tiếng Việt</string>
+    <string name="error_tts_missing_body">Ứng dụng cần giọng đọc tiếng Việt để nói. Hãy cài giọng đọc tiếng Việt trong cài đặt Chuyển văn bản thành giọng nói.</string>
+    <string name="error_tts_install">Cài giọng đọc</string>
+    <string name="error_tts_init">Không khởi động được bộ đọc giọng nói. Hãy kiểm tra cài đặt Chuyển văn bản thành giọng nói của máy.</string>
+    <string name="action_later">Để sau</string>
+    <string name="permission_title">Cần quyền camera và micro</string>
+    <string name="permission_body">Ứng dụng cần camera để nhìn chữ và đồ vật, và micro để nghe lệnh. Chạm vào nút lớn bên dưới để cấp quyền.</string>
+    <string name="permission_grant">Cấp quyền</string>
+    <string name="permission_open_settings">Mở cài đặt ứng dụng</string>
+    <string name="permission_denied_forever">Quyền đã bị từ chối. Chạm vào nút để mở cài đặt ứng dụng và bật quyền camera, micro.</string>
+<!-- Căn camera cho OCR (PLAN 4.2) -->
+    <string name="align_dark">Ánh sáng yếu</string>
+    <string name="align_shaky">Giữ yên máy</string>
+    <string name="align_blurry">Ảnh mờ, giữ yên</string>
+    <string name="align_too_close">Đưa máy ra xa</string>
+    <string name="align_off_left">Lệch trái</string>
+    <string name="align_off_right">Lệch phải</string>
+    <string name="align_too_small">Lại gần</string>
+    <string name="align_no_text">Chưa thấy chữ</string></resources>

@@ -115,6 +115,46 @@ class FeedbackCoordinatorTest {
     }
 
     @Test
+    fun pauseThenResumeReplaysCurrentAndQueued() {
+        fc.say("Câu một", Priority.STATE)
+        fc.say("Câu hai", Priority.STATE, queue = true)
+        assertTrue(fc.pauseSpeech())
+        assertFalse(speech.speaking)
+        assertTrue(fc.hasPausedSpeech())
+        assertTrue(fc.resumeSpeech())
+        speech.finish()
+        assertEquals(listOf("Câu một", "Câu một", "Câu hai"), speech.spoken)
+        assertFalse(fc.resumeSpeech())
+    }
+
+    @Test
+    fun pauseWhenSilentDoesNothing() {
+        assertFalse(fc.pauseSpeech())
+        assertFalse(fc.resumeSpeech())
+    }
+
+    @Test
+    fun repeatLastSpeaksLastUtteranceEvenAfterCooldownKey() {
+        assertFalse(fc.repeatLast())
+        fc.say("Đã thấy cốc", Priority.STATE)
+        speech.finish()
+        assertTrue(fc.repeatLast())
+        assertEquals(listOf("Đã thấy cốc", "Đã thấy cốc"), speech.spoken)
+    }
+
+    @Test
+    fun suspendedDropsSpeechAndVibrationUntilResumed() {
+        fc.say("Đang nói", Priority.STATE)
+        fc.setSuspended(true)
+        assertFalse(speech.speaking)
+        assertFalse(fc.say("Mất dấu", Priority.ALERT, userInitiated = true))
+        assertFalse(fc.vibrate(HapticPattern.LONG, force = true))
+        fc.setSuspended(false)
+        assertTrue(fc.say("Mất dấu", Priority.ALERT))
+        assertEquals(listOf("Đang nói", "Mất dấu"), speech.spoken)
+    }
+
+    @Test
     fun vibrationIsBlockedWhileSpeakingUnlessForced() {
         fc.say("Đang nói", Priority.STATE)
         assertFalse(fc.vibrate(HapticPattern.DEFAULT))

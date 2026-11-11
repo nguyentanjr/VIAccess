@@ -73,10 +73,12 @@ object MetricLogger {
         return snapshot.size
     }
 
-    private fun utcTimestamp(): String =
-        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ROOT).apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-        }.format(Date())
+    /** Dùng chung một formatter; chỉ gọi trong [log] (đã @Synchronized) nên an toàn luồng. */
+    private val utcFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.ROOT).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }
+
+    private fun utcTimestamp(): String = utcFormat.format(Date())
 
     private fun MetricEvent.toCsvRow(): String = listOf(
         timestampUtc,

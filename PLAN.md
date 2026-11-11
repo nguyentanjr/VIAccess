@@ -186,30 +186,30 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 - [ ] `[S]` Build + chạy trên máy thật, ghi model máy test *(build OK; chưa thử máy thật)*
 - [x] `[S]` Tạo `FeedbackConfig.kt`
 - [x] `[L]` `FeedbackCoordinator` (hàng đợi ưu tiên, cooldown, giới hạn) + chuyển mọi lời nói qua Coordinator *(Find, OCR, YOLO, MainScreen; Setup/Tutorial/Settings/AccessibleButton còn gọi trực tiếp — Hoàng chuyển khi làm onboarding/Settings)*
-- [ ] `[M]` 5 lệnh giọng nói + nút chạm dự phòng
-- [ ] `[M]` Xử lý lỗi bằng giọng nói (thiếu quyền, thiếu giọng TTS tiếng Việt, mất mạng, lỗi mô hình) + dừng TTS / rung / camera khi app chạy nền
+- [x] `[M]` 5 lệnh giọng nói + nút chạm dự phòng *(VoiceCommandParser; thanh nút Tìm / Đọc chữ / Dừng-Tiếp / Đọc lại / Cài đặt; chưa thử máy thật)*
+- [x] `[M]` Xử lý lỗi bằng giọng nói (thiếu quyền, thiếu giọng TTS tiếng Việt, mất mạng, lỗi mô hình) + dừng TTS / rung / camera khi app chạy nền *(chưa thử máy thật)*
 - [ ] `[S]` Chủ trì checklist kiểm thử chức năng (6.1)
 - [ ] `[M]` Báo cáo: kiến trúc, luồng tương tác, bảng kế thừa / tự phát triển (1.4)
 - [ ] `[M]` Chuẩn bị demo (máy, đạo cụ) + quay video demo S1–S4
 
 ### 9.2 Tiến — Đọc văn bản T1 (19)
 - [ ] `[M]` Bỏ tiếng Anh: strings, `coco.txt`, nhánh `useVietnamese`
-- [ ] `[L]` `ImageQuality`: Laplacian + vị trí / kích thước khung chữ
-- [ ] `[M]` `MotionMonitor`: gyroscope
-- [ ] `[L]` Luật căn camera 4.2 theo thứ tự ưu tiên + hiệu chỉnh ngưỡng
-- [ ] `[M]` Tích hợp vào `OCRScreen` + auto-capture
-- [ ] `[S]` `baselineMode` cho T1 (tắt nhắc căn chỉnh, đọc liên tục)
+- [x] `[L]` `ImageQuality`: Laplacian + vị trí / kích thước khung chữ *(ngưỡng Laplacian chưa hiệu chỉnh trên máy thật)*
+- [x] `[M]` `MotionMonitor`: gyroscope
+- [ ] `[L]` Luật căn camera 4.2 theo thứ tự ưu tiên + hiệu chỉnh ngưỡng *(luật xong trong `AlignmentAdvisor` + 8 test; còn hiệu chỉnh ngưỡng trên máy thật)*
+- [x] `[M]` Tích hợp vào `OCRScreen` + auto-capture *(chưa thử máy thật)*
+- [x] `[S]` `baselineMode` cho T1 (tắt nhắc căn chỉnh, đọc liên tục) *(chưa có công tắc trong Settings)*
 - [ ] `[L]` 30 mẫu OCR × 3 mức sáng + bản gõ tay, tính CER/WER, tỷ lệ tự chụp thành công
 - [ ] `[M]` Báo cáo: chương T1 + kết quả OCR
-- [ ] `[S]` README: hướng dẫn cài đặt và sử dụng
+- [x] `[S]` README: hướng dẫn cài đặt và sử dụng
 
 ### 9.3 Hùng — Tìm vật thể T2 (19)
-- [ ] `[M]` Danh sách 6 vật + lệnh "tìm <vật>"
-- [ ] `[L]` Máy trạng thái SEARCHING / FOUND / TRACKING / CENTERED / LOST
-- [ ] `[M]` Haptic patterns (ngắn / dài / đôi / lặp theo chu kỳ) + `baselineMode` cho T2
-- [ ] `[S]` Hướng trái / giữa / phải
-- [ ] `[S]` Unit test máy trạng thái Find + Coordinator
-- [ ] `[M]` `MetricLogger` (`VIA_METRIC`) + xuất CSV
+- [x] `[M]` Danh sách 6 vật + lệnh "tìm <vật>"
+- [x] `[L]` Máy trạng thái SEARCHING / FOUND / TRACKING / CENTERED / LOST
+- [x] `[M]` Haptic patterns (ngắn / dài / đôi / lặp theo chu kỳ) + `baselineMode` cho T2
+- [x] `[S]` Hướng trái / giữa / phải
+- [x] `[S]` Unit test máy trạng thái Find + Coordinator
+- [x] `[M]` `MetricLogger` (`VIA_METRIC`) + xuất CSV
 - [ ] `[L]` Bộ 150 ảnh vật thể + nhãn, tính P/R/F1
 - [ ] `[M]` Đo false positive (có / không luật 3 frame) + đo latency từ log
 - [ ] `[M]` Báo cáo: chương T2 + kết quả detection, FP, latency
@@ -262,3 +262,6 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 |---|---|---|
 | 2026-10-19 | — | Tạo repo VIAccess từ VisionAid, viết CLAUDE.md / PLAN.md |
 | 2026-10-22 | Tân | Nhánh tan/foundation: sửa build, gỡ Explore/History/Themes, FeedbackConfig, FeedbackCoordinator + 8 unit test |
+| 2026-11-10 | Tân | 5 lệnh giọng nói + nút chạm, dừng/tiếp/đọc lại trong Coordinator, báo lỗi bằng giọng nói, tạm ngưng khi chạy nền; +9 unit test |
+| 2026-11-10 | Tiến (Tân làm hộ) | ImageQuality, MotionMonitor, AlignmentAdvisor (luật 4.2) + 8 test, gắn vào OCRScreen + tự chụp, baselineMode T1, README |
+| 2026-11-11 | Hùng | Gộp main vào nhánh hung; sửa theo review: ngôn ngữ câu "Đang tìm", không báo "mất dấu" khi thấy lại vật, vẽ hộp từ kết quả persistence, so tên vật theo từ, MetricLogger dùng chung formatter |

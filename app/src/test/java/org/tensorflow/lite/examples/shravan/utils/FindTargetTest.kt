@@ -18,4 +18,12 @@ class FindTargetTest {
         assertNull(FindTarget.fromCommand("cốc"))
         assertNull(FindTarget.fromCommand("tìm ví"))
     }
+
+    @Test
+    fun matchesWholeWordsOnly() {
+        // "nghe" chứa "ghe" nhưng không phải "ghế"; "time" chứa "tim" nhưng không phải lệnh tìm.
+        assertNull(FindTarget.fromCommand("tìm nhạc để nghe"))
+        assertNull(FindTarget.fromCommand("what time is it phone"))
+        assertEquals(FindTarget.CUP, FindTarget.fromCommand("tìm cái ly"))
+    }
 }

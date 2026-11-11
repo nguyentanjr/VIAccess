@@ -29,9 +29,12 @@ class YoloAnalyzer(
 
     var allowedClasses: List<String>? = null
     var announcementsEnabled: Boolean = false
-    var inputSize: Int = 0
+    @Volatile var inputSize: Int = 0
         private set
     var onFrameResults: ((Long, List<Classifier.Recognition>) -> Unit)? = null
+    /** Gọi một lần (trên luồng phân tích ảnh) khi không nạp được mô hình YOLO. */
+    var onModelError: ((Throwable) -> Unit)? = null
+    @Volatile private var modelFailed = false
 
     private var currentDetector: YoloV5Classifier? = null
     private var currentLabels: List<String>? = null
@@ -97,6 +100,10 @@ class YoloAnalyzer(
                 image.close()
                 return
             }
+            if (modelFailed) {
+                image.close()
+                return
+            }
             val frameStartedAtNs = SystemClock.elapsedRealtimeNanos()
             val frameId = frameCounter.toLong()
             MetricLogger.log(
@@ -105,7 +112,15 @@ class YoloAnalyzer(
                 baselineMode = settingsManager.baselineMode
             )
             try {
-                val detector = getDetector()
+                val detector = try {
+                    getDetector()
+                } catch (e: Throwable) {
+                    // Không nạp được mô hình: báo một lần rồi ngừng thử để không lặp lỗi mỗi frame.
+                    modelFailed = true
+                    android.util.Log.e("YoloAnalyzer", "Model load failed", e)
+                    onModelError?.invoke(e)
+                    return
+                }
                 inputSize = detector.inputSize
                 val bitmap = ImageUtils.toBitmap(image)
                 if (bitmap == null) {
@@ -216,7 +231,7 @@ class YoloAnalyzer(
                     }
                 }
 
-                onResults?.invoke(currentFiltered)
+                onResults?.invoke(persistentRecognitions)
                 onFrameResults?.invoke(frameId, currentFiltered)
             } catch (e: Exception) {
                 MetricLogger.log(

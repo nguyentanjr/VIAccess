@@ -58,7 +58,9 @@ class FindStateMachineTest {
     }
 
     @Test
-    fun reportsLostWhenTheNextDetectionArrivesAfterTimeout() {
+    fun doesNotSayLostWhenTargetIsSeenAgainAfterAGap() {
+        // Khoảng trống không có frame nào (vd camera tạm dừng) rồi lại thấy vật:
+        // không được báo "mất dấu" trong khi vật đang ở trước camera; xác nhận lại từ đầu.
         val machine = FindStateMachine()
         repeat(3) { machine.update(listOf(cup()), 41, it * 100L) }
 
@@ -68,8 +70,8 @@ class FindStateMachineTest {
             200L + FeedbackConfig.FIND_LOST_MS + 1
         )
 
-        assertEquals(FindEvent.LOST, result.event)
-        assertEquals(FindState.LOST, result.state)
+        assertEquals(FindEvent.NONE, result.event)
+        assertEquals(FindState.SEARCHING, result.state)
     }
 
     @Test

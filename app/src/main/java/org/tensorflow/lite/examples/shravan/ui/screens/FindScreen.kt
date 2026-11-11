@@ -143,7 +143,7 @@ fun FindScreen(
                 baselineMode = settingsManager.baselineMode
             )
             feedback.say(
-                context.getString(
+                languageContext.getString(
                     R.string.find_looking_for,
                     activeTarget?.displayLabel(languageContext).orEmpty()
                 ),
@@ -182,7 +182,10 @@ fun FindScreen(
         analyzer.allowedClasses = activeTarget?.let {
             listOf(if (isVietnamese) it.vietnameseLabel else it.englishLabel)
         } ?: emptyList()
-        analyzer.onResults = null
+        // Vẽ hộp từ kết quả đã qua persistence (đỡ nháy); máy trạng thái dùng kết quả từng frame.
+        analyzer.onResults = { persistent ->
+            mainHandler.post { if (targetReference.get() != null) recognitions = persistent }
+        }
         analyzer.onFrameResults = { frameId, results ->
             val target = targetReference.get()
             val inputSize = analyzer.inputSize
@@ -228,7 +231,6 @@ fun FindScreen(
 
             mainHandler.post {
                 if (targetReference.get() != target) return@post
-                recognitions = results
                 frameResult = result
 
                 if (target != null && baselineMode) {
