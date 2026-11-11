@@ -17,12 +17,14 @@ enum class FindTarget(
     val vietnameseLabel: String,
     val displayName: String,
     val aliases: List<String>,
-    val isCore: Boolean = false
+    val isCore: Boolean = false,
+    /** Ngưỡng tin cậy để coi là thấy vật; vật khó dùng ngưỡng thấp hơn. */
+    val minConfidence: Float = FeedbackConfig.FIND_MIN_CONFIDENCE
 ) {
     CUP(41, "cup", "cốc", "Cốc", listOf("cup", "cốc", "ly", "cái ly"), isCore = true),
-    BOTTLE(39, "bottle", "chai", "Chai", listOf("bottle", "chai", "chai nước"), isCore = true),
+    BOTTLE(39, "bottle", "chai", "Chai", listOf("bottle", "chai", "chai nước"), isCore = true, minConfidence = FeedbackConfig.FIND_MIN_CONFIDENCE_HARD),
     PHONE(67, "cell phone", "điện thoại di động", "Điện thoại", listOf("cell phone", "phone", "điện thoại"), isCore = true),
-    REMOTE(65, "remote", "điều khiển từ xa", "Điều khiển", listOf("remote", "điều khiển"), isCore = true),
+    REMOTE(65, "remote", "điều khiển từ xa", "Điều khiển", listOf("remote", "điều khiển"), isCore = true, minConfidence = FeedbackConfig.FIND_MIN_CONFIDENCE_HARD),
     BOOK(73, "book", "sách", "Sách", listOf("book", "sách", "quyển sách", "cuốn sách"), isCore = true),
     CHAIR(56, "chair", "ghế", "Ghế", listOf("chair", "ghế", "cái ghế"), isCore = true),
 
@@ -30,13 +32,13 @@ enum class FindTarget(
     HANDBAG(26, "handbag", "túi xách", "Túi xách", listOf("handbag", "túi xách", "túi")),
     UMBRELLA(25, "umbrella", "ô", "Ô (dù)", listOf("umbrella", "cái ô", "chiếc ô", "dù", "cái dù")),
     LAPTOP(63, "laptop", "máy tính xách tay", "Laptop", listOf("laptop", "máy tính", "máy tính xách tay")),
-    MOUSE(64, "mouse", "chuột", "Chuột", listOf("mouse", "chuột", "chuột máy tính")),
+    MOUSE(64, "mouse", "chuột", "Chuột", listOf("mouse", "chuột", "chuột máy tính"), minConfidence = FeedbackConfig.FIND_MIN_CONFIDENCE_HARD),
     KEYBOARD(66, "keyboard", "bàn phím", "Bàn phím", listOf("keyboard", "bàn phím")),
     CLOCK(74, "clock", "đồng hồ", "Đồng hồ", listOf("clock", "đồng hồ")),
-    SCISSORS(76, "scissors", "kéo", "Kéo", listOf("scissors", "kéo", "cái kéo")),
-    SPOON(44, "spoon", "thìa", "Thìa", listOf("spoon", "thìa", "muỗng")),
+    SCISSORS(76, "scissors", "kéo", "Kéo", listOf("scissors", "kéo", "cái kéo"), minConfidence = FeedbackConfig.FIND_MIN_CONFIDENCE_HARD),
+    SPOON(44, "spoon", "thìa", "Thìa", listOf("spoon", "thìa", "muỗng"), minConfidence = FeedbackConfig.FIND_MIN_CONFIDENCE_HARD),
     BOWL(45, "bowl", "bát", "Bát", listOf("bowl", "bát", "chén", "cái bát")),
-    TOOTHBRUSH(79, "toothbrush", "bàn chải đánh răng", "Bàn chải", listOf("toothbrush", "bàn chải", "bàn chải đánh răng"));
+    TOOTHBRUSH(79, "toothbrush", "bàn chải đánh răng", "Bàn chải", listOf("toothbrush", "bàn chải", "bàn chải đánh răng"), minConfidence = FeedbackConfig.FIND_MIN_CONFIDENCE_HARD);
 
     companion object {
         fun fromCommand(command: String): FindTarget? {

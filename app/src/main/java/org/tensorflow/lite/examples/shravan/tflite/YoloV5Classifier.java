@@ -262,7 +262,8 @@ public class YoloV5Classifier implements Classifier {
     private static final int NUM_BOXES_PER_BLOCK = 3;
 
     // Number of threads in the java app
-    private static final int NUM_THREADS = 1;
+    // 4 luồng CPU: suy luận nhanh hơn đáng kể trên máy nhiều nhân (trước đây 1).
+    private static final int NUM_THREADS = 4;
     private static boolean isNNAPI = false;
     private static boolean isGPU = false;
 

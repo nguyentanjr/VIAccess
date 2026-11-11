@@ -364,7 +364,8 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
         ) {
             // Shared CameraPreview layer
             if (currentPage != PAGE_SETTINGS) {
-                val zoom = if (currentPage == PAGE_FIND) 0.6f else 1.0f
+                // Không thu nhỏ ở màn Tìm: vật to hơn trong ảnh thì YOLO nhận diện tốt hơn.
+                val zoom = 1.0f
                 CameraPreview(
                     modifier = Modifier.fillMaxSize(),
                     zoomRatio = zoom,

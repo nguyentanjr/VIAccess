@@ -41,13 +41,14 @@ class FindStateMachine {
     fun update(
         observations: List<FindObservation>,
         targetClassId: Int,
-        nowMs: Long
+        nowMs: Long,
+        minConfidence: Float = FeedbackConfig.FIND_MIN_CONFIDENCE
     ): FindFrameResult {
         val observation = observations
             .asSequence()
             .filter {
                 it.classId == targetClassId &&
-                    it.confidence >= FeedbackConfig.FIND_MIN_CONFIDENCE
+                    it.confidence >= minConfidence
             }
             .maxByOrNull { it.confidence }
 

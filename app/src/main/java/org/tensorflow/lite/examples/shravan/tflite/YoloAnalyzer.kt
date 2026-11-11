@@ -130,12 +130,16 @@ class YoloAnalyzer(
                 val rotatedBitmap = Bitmap.createBitmap(
                     bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
                 )
-                val scaledBitmap = Bitmap.createScaledBitmap(
-                    rotatedBitmap, detector.inputSize, detector.inputSize, true
-                )
+                // Letterbox: giữ đúng tỉ lệ ảnh (thêm viền xám) thay vì kéo méo 4:3 thành vuông,
+                // giống cách YOLOv5 được huấn luyện → vật không bị bóp dẹt, nhận diện tốt hơn.
+                val box = Letterbox.of(rotatedBitmap.width, rotatedBitmap.height, detector.inputSize)
+                val scaledBitmap = Letterbox.apply(rotatedBitmap, box)
 
                 val inferenceStartedAtNs = SystemClock.elapsedRealtimeNanos()
                 val results = detector.recognizeImage(scaledBitmap)
+                // Đưa toạ độ về hệ "cả ảnh co về inputSize×inputSize" như trước, để phần vẽ khung,
+                // tính hướng và diện tích ở FindScreen không phải đổi.
+                results.forEach { r -> r.location?.let { r.location = box.toFullFrame(it) } }
                 val inferenceFinishedAtNs = SystemClock.elapsedRealtimeNanos()
                 MetricLogger.log(
                     event = "inference_complete",

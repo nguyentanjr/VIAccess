@@ -231,7 +231,7 @@ fun FindScreen(
                         hapticIntervalMs = observation?.trackingIntervalMs()
                     )
                 } else {
-                    stateMachine.update(observations, target.classId, android.os.SystemClock.elapsedRealtime())
+                    stateMachine.update(observations, target.classId, android.os.SystemClock.elapsedRealtime(), target.minConfidence)
                 }
             }
 

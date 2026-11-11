@@ -46,7 +46,7 @@ object FeedbackConfig {
     const val OCR_REPEAT_COOLDOWN_MS = 10_000L
 
     // --- Nhận diện vật thể (kế thừa YoloAnalyzer) ---
-    const val YOLO_FRAME_SKIP = 5
+    const val YOLO_FRAME_SKIP = 2
     const val YOLO_MIN_CONFIDENCE = 0.25f
     const val YOLO_PERSISTENCE_FRAMES = 5
     const val YOLO_DEBOUNCE_TOTALLY_BLIND_MS = 1000L
@@ -56,6 +56,8 @@ object FeedbackConfig {
     // --- Tìm vật thể (PLAN 4.3) ---
     const val FIND_CONFIRM_FRAMES = 3
     const val FIND_MIN_CONFIDENCE = 0.5f
+    /** Vật khó (nhỏ, trong suốt, mảnh): hạ ngưỡng; luật 3 frame liên tiếp vẫn chặn báo nhầm. */
+    const val FIND_MIN_CONFIDENCE_HARD = 0.4f
     const val FIND_LOST_MS = 1500L
     const val FIND_CENTERED_MS = 1000L
     const val FIND_DIRECTION_COOLDOWN_MS = 2000L

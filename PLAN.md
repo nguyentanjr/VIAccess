@@ -272,3 +272,4 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 | 2026-11-11 | Hoàng | ReadingController (đọc theo câu, +5 test), Cài đặt mới (chữ 24sp, mức chi tiết, chế độ so sánh A/B), nhãn TalkBack cho nút, script eval/ (SUS, TLX, Wilcoxon, P/R/F1, CER/WER, độ trễ), tài liệu khảo sát / wireframe / kịch bản thử nghiệm |
 | 2026-11-11 | Tân | Soạn bản phạm vi gửi cô, checklist kiểm thử 6.1 (+ heuristic), nháp chương kiến trúc & luồng |
 | 2026-11-11 | Tân | Mở rộng Tìm vật lên 17 vật (FindTarget + lưới 3 cột), +2 test (so khớp lệnh, khớp nhãn coco_vi) |
+| 2026-11-11 | Tân | Tăng nhận diện: zoom 1.0 ở màn Tìm, letterbox giữ tỉ lệ ảnh, YOLO 4 luồng + chạy mỗi 2 frame, ngưỡng 0.4 cho vật khó (chai, điều khiển, chuột, kéo, thìa, bàn chải); +3 test. Máy ảo: suy luận TB ~170 ms |
