@@ -212,7 +212,7 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 - [x] `[M]` `MetricLogger` (`VIA_METRIC`) + xuất CSV
 - [ ] `[L]` Bộ 150 ảnh vật thể + nhãn, tính P/R/F1
 - [ ] `[M]` Đo false positive (có / không luật 3 frame) + đo latency từ log
-- [ ] `[M]` Báo cáo: chương T2 + kết quả detection, FP, latency
+- [ ] `[M]` Báo cáo: chương T2 + kết quả detection, FP, latency *(nháp: docs/bao_cao/chuong_t2_tim_vat.md, chờ số liệu)*
 - [ ] `[S]` Đóng gói dữ liệu mẫu test (ảnh, mẫu OCR, CSV log) để nộp
 
 ### 9.4 Hoàng — TTS, accessibility, đánh giá người dùng (20)
