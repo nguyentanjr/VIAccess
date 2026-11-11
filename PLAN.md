@@ -179,7 +179,7 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 
 ### 9.1 Tân — luồng chính & tích hợp (20)
 - [x] Copy repo, bỏ dữ liệu / build, sửa `settings.gradle`
-- [ ] `[S]` Gửi cô bản phạm vi đã thu gọn (mục 1, 4, 6) để duyệt
+- [ ] `[S]` Gửi cô bản phạm vi đã thu gọn (mục 1, 4, 6) để duyệt *(đã soạn: docs/pham_vi_gui_co.md, chờ gửi)*
 - [x] `[M]` `git init`, đẩy lên repo nhóm; mỗi người một nhánh (`tan`, `tien`, `hung`, `hoang`), gộp vào `main` qua Pull Request
 - [x] Xóa `RoboflowAnalyzer.kt` (chứa API key)
 - [x] `[M]` Gỡ Explore / History / Themes khỏi navigation
@@ -188,8 +188,8 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 - [x] `[L]` `FeedbackCoordinator` (hàng đợi ưu tiên, cooldown, giới hạn) + chuyển mọi lời nói qua Coordinator *(Find, OCR, YOLO, MainScreen; Setup/Tutorial/Settings/AccessibleButton còn gọi trực tiếp — Hoàng chuyển khi làm onboarding/Settings)*
 - [x] `[M]` 5 lệnh giọng nói + nút chạm dự phòng *(VoiceCommandParser; thanh nút Tìm / Đọc chữ / Dừng-Tiếp / Đọc lại / Cài đặt; chưa thử máy thật)*
 - [x] `[M]` Xử lý lỗi bằng giọng nói (thiếu quyền, thiếu giọng TTS tiếng Việt, mất mạng, lỗi mô hình) + dừng TTS / rung / camera khi app chạy nền *(chưa thử máy thật)*
-- [ ] `[S]` Chủ trì checklist kiểm thử chức năng (6.1)
-- [ ] `[M]` Báo cáo: kiến trúc, luồng tương tác, bảng kế thừa / tự phát triển (1.4)
+- [ ] `[S]` Chủ trì checklist kiểm thử chức năng (6.1) *(checklist: docs/checklist_kiem_thu.md, chờ chạy trên máy)*
+- [ ] `[M]` Báo cáo: kiến trúc, luồng tương tác, bảng kế thừa / tự phát triển (1.4) *(nháp: docs/bao_cao/chuong_kien_truc.md)*
 - [ ] `[M]` Chuẩn bị demo (máy, đạo cụ) + quay video demo S1–S4
 
 ### 9.2 Tiến — Đọc văn bản T1 (19)
@@ -267,3 +267,4 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 | 2026-11-11 | Hùng | Gộp main vào nhánh hung; sửa theo review: ngôn ngữ câu "Đang tìm", không báo "mất dấu" khi thấy lại vật, vẽ hộp từ kết quả persistence, so tên vật theo từ, MetricLogger dùng chung formatter |
 | 2026-11-11 | Tiến | Bỏ tiếng Anh: chỉ còn strings tiếng Việt, xoá coco.txt, useVietnamese luôn true, bỏ chọn ngôn ngữ ở Cài đặt và màn thiết lập; viết lại lời hướng dẫn |
 | 2026-11-11 | Hoàng | ReadingController (đọc theo câu, +5 test), Cài đặt mới (chữ 24sp, mức chi tiết, chế độ so sánh A/B), nhãn TalkBack cho nút, script eval/ (SUS, TLX, Wilcoxon, P/R/F1, CER/WER, độ trễ), tài liệu khảo sát / wireframe / kịch bản thử nghiệm |
+| 2026-11-11 | Tân | Soạn bản phạm vi gửi cô, checklist kiểm thử 6.1 (+ heuristic), nháp chương kiến trúc & luồng |
