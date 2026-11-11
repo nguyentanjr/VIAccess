@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">VIAccess</string>
     <string name="welcome_text">Chào mừng bạn đến với VIAccess. Bạn khiếm thị một phần hay hoàn toàn? Hãy nói, hoặc chạm vào nửa trên hay nửa dưới màn hình.</string>
-    <string name="nav_find">Tìm kiếm</string>
-    <string name="nav_ocr">Đọc văn bản</string>
+    <string name="nav_find">Tìm vật</string>
+    <string name="nav_ocr">Đọc chữ</string>
     <string name="nav_settings">Cài đặt</string>
     <string name="settings_haptics">Rung</string>
     <string name="settings_speech_rate">Tốc độ nói</string>
@@ -40,7 +40,7 @@
     <string name="find_choose_target">Chọn một vật hoặc nói “tìm” cùng tên vật.</string>
     <string name="find_baseline_toggle">Chế độ baseline</string>
     <string name="find_baseline_mode">Đang bật chế độ baseline</string>
-    <string name="find_export_metrics">Xuất CSV</string>
+    <string name="find_export_metrics">Xuất số liệu (CSV)</string>
     <string name="find_export_success">Đã xuất %1$d dòng chỉ số</string>
     <string name="find_export_error">Không thể xuất dữ liệu chỉ số</string>
     <string name="ocr_greeting">Đọc văn bản</string>

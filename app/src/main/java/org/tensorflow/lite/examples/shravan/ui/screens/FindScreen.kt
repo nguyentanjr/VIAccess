@@ -18,6 +18,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -304,39 +307,6 @@ fun FindScreen(
         }
     }
 
-    val exportLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("text/csv")
-    ) { uri ->
-        if (uri != null) {
-            scope.launch {
-                try {
-                    val count = withContext(Dispatchers.IO) {
-                        MetricLogger.exportCsv(context, uri)
-                    }
-                    feedback.say(
-                        languageContext.getString(R.string.find_export_success, count),
-                        Priority.STATE,
-                        userInitiated = true
-                    )
-                } catch (error: IOException) {
-                    Log.e("FindScreen", "Unable to export metric CSV", error)
-                    feedback.say(
-                        languageContext.getString(R.string.find_export_error),
-                        Priority.ALERT,
-                        userInitiated = true
-                    )
-                } catch (error: SecurityException) {
-                    Log.e("FindScreen", "Permission denied while exporting metric CSV", error)
-                    feedback.say(
-                        languageContext.getString(R.string.find_export_error),
-                        Priority.ALERT,
-                        userInitiated = true
-                    )
-                }
-            }
-        }
-    }
-
     val targetLabel = activeTarget?.displayLabel(languageContext)
     val stateLabel = when {
         activeTarget == null -> languageContext.getString(R.string.find_choose_target)
@@ -348,7 +318,8 @@ fun FindScreen(
         else -> languageContext.getString(R.string.find_tracking, targetLabel.orEmpty())
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+    // Nền trong suốt: camera được vẽ ở lớp dưới (MainScreen).
+    Box(modifier = Modifier.fillMaxSize()) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             val inputSize = yoloAnalyzer?.inputSize?.takeIf { it > 0 } ?: return@Canvas
             recognitions.forEach { recognition ->
@@ -378,34 +349,17 @@ fun FindScreen(
                 .fillMaxWidth()
                 .align(Alignment.TopCenter)
                 .background(Color.Black.copy(alpha = 0.78f))
-                .padding(12.dp),
+                .statusBarsPadding()
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    languageContext.getString(R.string.find_baseline_toggle),
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Switch(
-                    checked = settingsManager.baselineMode,
-                    onCheckedChange = { settingsManager.baselineMode = it }
-                )
-                Button(
-                    onClick = { exportLauncher.launch("viaccess_metrics.csv") },
-                    modifier = Modifier.heightIn(min = 48.dp)
-                ) {
-                    Text(languageContext.getString(R.string.find_export_metrics))
-                }
-            }
+            // Công tắc chế độ so sánh và nút xuất số liệu đã chuyển vào Cài đặt.
             Text(
                 text = stateLabel,
                 color = Color.White,
-                style = MaterialTheme.typography.titleLarge
+                fontSize = 24.sp,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                modifier = Modifier.semantics { liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite }
             )
         }
 

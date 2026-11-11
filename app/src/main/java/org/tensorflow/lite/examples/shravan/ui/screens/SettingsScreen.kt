@@ -21,6 +21,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import org.tensorflow.lite.examples.shravan.R
 import org.tensorflow.lite.examples.shravan.utils.*
 
@@ -135,6 +136,30 @@ fun SettingsScreen(
         }
         Text(stringResource(R.string.settings_baseline_hint), color = Color(0xFFDDDDDD), fontSize = 20.sp)
 
+        // Xuất log VIA_METRIC ra CSV để tính chỉ số (eval/eval.py).
+        val context = androidx.compose.ui.platform.LocalContext.current
+        val scope = rememberCoroutineScope()
+        val exportOk = stringResource(R.string.find_export_success)
+        val exportErr = stringResource(R.string.find_export_error)
+        val exportLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
+            androidx.activity.result.contract.ActivityResultContracts.CreateDocument("text/csv")
+        ) { uri ->
+            if (uri != null) scope.launch {
+                try {
+                    val count = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                        MetricLogger.exportCsv(context, uri)
+                    }
+                    announce(String.format(exportOk, count))
+                } catch (e: Exception) {
+                    android.util.Log.e("SettingsScreen", "Export failed", e)
+                    announce(exportErr)
+                }
+            }
+        }
+        BigButton(stringResource(R.string.find_export_metrics), Modifier.fillMaxWidth()) {
+            exportLauncher.launch("viaccess_metrics.csv")
+        }
+
         Spacer(Modifier.height(8.dp))
 
         // Khôi phục cài đặt gốc: chạm 7 lần để tránh bấm nhầm.
@@ -210,12 +235,13 @@ private fun <T> ChoiceGroup(title: String, options: List<Pair<String, T>>, curre
                             contentDescription = "$title: $label"
                         },
                     shape = RoundedCornerShape(12.dp),
+                    contentPadding = PaddingValues(horizontal = 4.dp, vertical = 8.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (isSelected) Accent else Color(0xFF2A2A2A),
                         contentColor = if (isSelected) Color.Black else Fg
                     )
                 ) {
-                    Text(label, fontSize = 20.sp, maxLines = 1)
+                    Text(label, fontSize = 20.sp, maxLines = 2, softWrap = true, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                 }
             }
         }
