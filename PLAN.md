@@ -214,7 +214,7 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 - [x] `[L]` Bộ 150 ảnh vật thể + nhãn, tính P/R/F1
 - [x] `[M]` Đo false positive (có / không luật 3 frame) + đo latency từ log
 - [x] `[M]` Báo cáo: chương T2 + kết quả detection, FP, latency *(nháp: docs/bao_cao/chuong_t2_tim_vat.md, chờ số liệu)*
-- [x] `[S]` Đóng gói dữ liệu mẫu test (ảnh, mẫu OCR, CSV log) để nộp
+- [ ] `[S]` Đóng gói dữ liệu mẫu test (ảnh, mẫu OCR, CSV log) để nộp
 
 ### 9.4 Hoàng — TTS, accessibility, đánh giá người dùng (20)
 - [x] `[M]` Khảo sát giải pháp liên quan (Seeing AI, Lookout, Envision, Be My Eyes, VisionAid)
