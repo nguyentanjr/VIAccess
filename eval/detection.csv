@@ -1,0 +1,149 @@
+image,light,gt,pred
+book_00.jpg,sang,sách,none
+book_01.jpg,sang,sách,none
+book_02.jpg,sang,sách,none
+book_03.jpg,sang,sách,cốc
+book_04.jpg,sang,sách,none
+book_05.jpg,sang,sách,none
+book_06.jpg,sang,sách,cốc
+book_07.jpg,sang,sách,none
+book_08.jpg,sang,sách,none
+book_09.jpg,sang,sách,điện thoại
+book_10.jpg,sang,sách,điện thoại
+book_11.jpg,sang,sách,chai
+book_12.jpg,sang,sách,chai
+book_14.jpg,toi,sách,chai
+book_15.jpg,toi,sách,điện thoại
+book_16.jpg,toi,sách,none
+book_17.jpg,toi,sách,none
+book_18.jpg,toi,sách,none
+book_19.jpg,toi,sách,none
+book_20.jpg,toi,sách,none
+book_21.jpg,toi,sách,none
+book_22.jpg,toi,sách,none
+book_23.jpg,toi,sách,none
+book_24.jpg,toi,sách,none
+bottle_00.jpg,sang,chai,chai
+bottle_01.jpg,sang,chai,chai
+bottle_02.jpg,sang,chai,chai
+bottle_03.jpg,sang,chai,chai
+bottle_04.jpg,sang,chai,chai
+bottle_05.jpg,sang,chai,chai
+bottle_06.jpg,sang,chai,chai
+bottle_07.jpg,sang,chai,chai
+bottle_08.jpg,sang,chai,chai
+bottle_09.jpg,sang,chai,chai
+bottle_11.jpg,sang,chai,chai
+bottle_12.jpg,sang,chai,chai
+bottle_13.jpg,sang,chai,chai
+bottle_14.jpg,sang,chai,chai
+bottle_15.jpg,toi,chai,chai
+bottle_16.jpg,toi,chai,chai
+bottle_17.jpg,toi,chai,chai
+bottle_18.jpg,toi,chai,chai
+bottle_19.jpg,toi,chai,chai
+bottle_20.jpg,toi,chai,chai
+bottle_21.jpg,toi,chai,chai
+bottle_22.jpg,toi,chai,chai
+bottle_23.jpg,toi,chai,chai
+bottle_24.jpg,toi,chai,chai
+cell_phone_00.jpg,sang,điện thoại,điện thoại
+cell_phone_01.jpg,sang,điện thoại,điện thoại
+cell_phone_02.jpg,sang,điện thoại,điện thoại
+cell_phone_03.jpg,sang,điện thoại,điện thoại
+cell_phone_04.jpg,sang,điện thoại,điện thoại
+cell_phone_05.jpg,sang,điện thoại,điện thoại
+cell_phone_06.jpg,sang,điện thoại,điện thoại
+cell_phone_07.jpg,sang,điện thoại,điện thoại
+cell_phone_08.jpg,sang,điện thoại,điện thoại
+cell_phone_09.jpg,sang,điện thoại,điện thoại
+cell_phone_10.jpg,sang,điện thoại,điện thoại
+cell_phone_11.jpg,sang,điện thoại,điện thoại
+cell_phone_12.jpg,sang,điện thoại,điện thoại
+cell_phone_13.jpg,sang,điện thoại,điện thoại
+cell_phone_14.jpg,sang,điện thoại,điện thoại
+cell_phone_15.jpg,toi,điện thoại,điện thoại
+cell_phone_16.jpg,toi,điện thoại,điện thoại
+cell_phone_17.jpg,toi,điện thoại,điện thoại
+cell_phone_18.jpg,toi,điện thoại,điện thoại
+cell_phone_19.jpg,toi,điện thoại,điện thoại
+cell_phone_20.jpg,toi,điện thoại,điện thoại
+cell_phone_21.jpg,toi,điện thoại,điện thoại
+cell_phone_22.jpg,toi,điện thoại,điện thoại
+cell_phone_23.jpg,toi,điện thoại,điện thoại
+cell_phone_24.jpg,toi,điện thoại,điện thoại
+chair_00.jpg,sang,ghế,none
+chair_01.jpg,sang,ghế,none
+chair_02.jpg,sang,ghế,điện thoại
+chair_03.jpg,sang,ghế,ghế
+chair_04.jpg,sang,ghế,none
+chair_05.jpg,sang,ghế,none
+chair_06.jpg,sang,ghế,điện thoại
+chair_07.jpg,sang,ghế,điều khiển
+chair_08.jpg,sang,ghế,điều khiển
+chair_09.jpg,sang,ghế,điều khiển
+chair_10.jpg,sang,ghế,điều khiển
+chair_11.jpg,sang,ghế,điều khiển
+chair_12.jpg,sang,ghế,điều khiển
+chair_13.jpg,sang,ghế,none
+chair_14.jpg,sang,ghế,none
+chair_15.jpg,sang,ghế,none
+chair_16.jpg,sang,ghế,none
+chair_17.jpg,toi,ghế,none
+chair_18.jpg,toi,ghế,none
+chair_19.jpg,toi,ghế,điều khiển
+chair_20.jpg,toi,ghế,điều khiển
+chair_21.jpg,toi,ghế,điều khiển
+chair_22.jpg,toi,ghế,ghế
+chair_23.jpg,toi,ghế,none
+chair_24.jpg,toi,ghế,ghế
+cup_00.jpg,sang,cốc,cốc
+cup_01.jpg,sang,cốc,cốc
+cup_02.jpg,sang,cốc,cốc
+cup_03.jpg,sang,cốc,cốc
+cup_04.jpg,sang,cốc,cốc
+cup_05.jpg,sang,cốc,cốc
+cup_06.jpg,sang,cốc,cốc
+cup_07.jpg,sang,cốc,cốc
+cup_08.jpg,sang,cốc,cốc
+cup_09.jpg,sang,cốc,cốc
+cup_10.jpg,sang,cốc,cốc
+cup_11.jpg,sang,cốc,cốc
+cup_12.jpg,sang,cốc,cốc
+cup_13.jpg,toi,cốc,none
+cup_14.jpg,toi,cốc,cốc
+cup_15.jpg,toi,cốc,cốc
+cup_16.jpg,toi,cốc,cốc
+cup_17.jpg,toi,cốc,cốc
+cup_18.jpg,toi,cốc,cốc
+cup_19.jpg,toi,cốc,cốc
+cup_20.jpg,toi,cốc,cốc
+cup_21.jpg,toi,cốc,cốc
+cup_22.jpg,toi,cốc,cốc
+cup_23.jpg,toi,cốc,cốc
+cup_24.jpg,toi,cốc,cốc
+remote_00.jpg,sang,điều khiển,điện thoại
+remote_01.jpg,sang,điều khiển,điện thoại
+remote_02.jpg,sang,điều khiển,điện thoại
+remote_03.jpg,sang,điều khiển,điện thoại
+remote_04.jpg,sang,điều khiển,điện thoại
+remote_05.jpg,sang,điều khiển,điện thoại
+remote_06.jpg,sang,điều khiển,điều khiển
+remote_07.jpg,sang,điều khiển,điều khiển
+remote_08.jpg,sang,điều khiển,điều khiển
+remote_09.jpg,sang,điều khiển,điện thoại
+remote_10.jpg,sang,điều khiển,điện thoại
+remote_11.jpg,sang,điều khiển,điện thoại
+remote_12.jpg,sang,điều khiển,điện thoại
+remote_13.jpg,sang,điều khiển,điều khiển
+remote_14.jpg,toi,điều khiển,none
+remote_15.jpg,toi,điều khiển,điện thoại
+remote_16.jpg,toi,điều khiển,điện thoại
+remote_17.jpg,toi,điều khiển,điều khiển
+remote_18.jpg,toi,điều khiển,điều khiển
+remote_19.jpg,toi,điều khiển,điện thoại
+remote_20.jpg,toi,điều khiển,điện thoại
+remote_21.jpg,toi,điều khiển,điện thoại
+remote_22.jpg,toi,điều khiển,điện thoại
+remote_23.jpg,toi,điều khiển,điều khiển
+remote_24.jpg,toi,điều khiển,điện thoại
