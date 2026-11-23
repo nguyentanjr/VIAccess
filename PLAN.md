@@ -276,3 +276,4 @@ Ký hiệu: `[S]` 1 điểm · `[M]` 2 điểm · `[L]` 3 điểm.
 | 2026-11-11 | Tân | Mở rộng Tìm vật lên 17 vật (FindTarget + lưới 3 cột), +2 test (so khớp lệnh, khớp nhãn coco_vi) |
 | 2026-11-11 | Tân | Tăng nhận diện: zoom 1.0 ở màn Tìm, letterbox giữ tỉ lệ ảnh, YOLO 4 luồng + chạy mỗi 2 frame, ngưỡng 0.4 cho vật khó (chai, điều khiển, chuột, kéo, thìa, bàn chải); +3 test. Máy ảo: suy luận TB ~170 ms |
 | 2026-11-11 | Tân | Khám phá xung quanh (ExploreSummarizer), lệnh + vuốt câu tiếp / câu trước, đọc QR / mã vạch + VietQR (BarcodeInfo); +7 test |
+| 2026-11-23 | Tân | Gộp nhánh hung (số liệu T2) vào main; chữ nút chọn vật 24sp + tương phản cao, nhãn thanh dưới 18sp đậm (ngoại lệ do 5 nút); bỏ quyền INTERNET; sửa tràn chữ màn Tìm và Đọc chữ |

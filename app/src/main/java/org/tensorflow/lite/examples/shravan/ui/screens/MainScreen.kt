@@ -359,7 +359,8 @@ val activeAnalyzer = if (currentPage != PAGE_SETTINGS) stableCompositeAnalyzer e
                     val label = stringResource(item.label)
                     NavigationBarItem(
                         icon = { Icon(item.icon, contentDescription = null, modifier = Modifier.size(32.dp)) },
-                        label = { Text(label, fontSize = 13.sp, maxLines = 1) },
+                        // 5 nút trên ~411dp: 18sp đậm là cỡ lớn nhất không bị cắt chữ (ngoại lệ của quy tắc ≥ 24sp, có icon 32dp đi kèm).
+                        label = { Text(label, fontSize = 18.sp, maxLines = 1, softWrap = false, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) },
                         selected = item.selected,
                         colors = itemColors,
                         modifier = Modifier.semantics { contentDescription = label },

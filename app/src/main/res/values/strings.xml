@@ -37,7 +37,7 @@
     <string name="find_centered">Ở phía trước</string>
     <string name="find_searching">Đang tìm %s</string>
     <string name="find_tracking">Đang theo dõi %s</string>
-    <string name="find_choose_target">Chọn một vật hoặc nói “tìm” cùng tên vật.</string>
+    <string name="find_choose_target">Chọn vật cần tìm</string>
     <string name="find_baseline_toggle">Chế độ baseline</string>
     <string name="find_baseline_mode">Đang bật chế độ baseline</string>
     <string name="find_export_metrics">Xuất số liệu (CSV)</string>

@@ -388,7 +388,7 @@ fun FindScreen(
             // 6 vật gốc xếp trước.
             Column(
                 modifier = Modifier
-                    .heightIn(max = 196.dp)
+                    .heightIn(max = 230.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -404,22 +404,16 @@ fun FindScreen(
                                 modifier = Modifier.weight(1f).heightIn(min = 56.dp),
                                 shape = RoundedCornerShape(12.dp),
                                 contentPadding = PaddingValues(horizontal = 4.dp, vertical = 6.dp),
+                                // Tương phản cao: chữ trắng trên xám đậm (~14:1), đang chọn: đen trên vàng (~17:1).
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (selected) {
-                                        MaterialTheme.colorScheme.primary
-                                    } else {
-                                        MaterialTheme.colorScheme.secondaryContainer
-                                    },
-                                    contentColor = if (selected) {
-                                        MaterialTheme.colorScheme.onPrimary
-                                    } else {
-                                        MaterialTheme.colorScheme.onSecondaryContainer
-                                    }
-                                )
+                                    containerColor = if (selected) Color(0xFFFFD600) else Color(0xFF2A2A2A),
+                                    contentColor = if (selected) Color.Black else Color.White
+                                ),
+                                border = if (selected) null else androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF8A8A8A))
                             ) {
                                 Text(
                                     text = target.displayName,
-                                    fontSize = 18.sp,
+                                    fontSize = 24.sp,
                                     maxLines = 2,
                                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                                 )

@@ -279,9 +279,13 @@ fun OCRScreen(
                     text = currentText,
                     color = Color.White,
                     fontSize = 24.sp,
+                    // Tối đa 4 dòng, chừa chỗ cho thanh nút ở dưới để chữ không bị che.
+                    maxLines = 4,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.Black.copy(alpha = 0.5f))
+                        .padding(bottom = 88.dp)
+                        .background(Color.Black.copy(alpha = 0.75f))
                         .padding(16.dp)
                 )
             }
