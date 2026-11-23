@@ -25,19 +25,19 @@ Không có luật 3 frame và không có trạng thái: hễ thấy vật trong 
 
 | Lớp | P | R | F1 |
 |---|---|---|---|
-| cốc | […] | […] | […] |
-| chai | […] | […] | […] |
-| điện thoại | […] | […] | […] |
-| điều khiển | […] | […] | […] |
-| sách | […] | […] | […] |
-| ghế | […] | […] | […] |
-| macro | […] | […] | […] |
+| cốc | 0.92 | 0.96 | 0.94 |
+| chai | 0.89 | 1.00 | 0.94 |
+| điện thoại | 0.53 | 1.00 | 0.69 |
+| điều khiển | 0.44 | 0.28 | 0.34 |
+| sách | 0.00 | 0.00 | 0.00 |
+| ghế | 1.00 | 0.12 | 0.21 |
+| macro | 0.63 | 0.56 | 0.52 |
 
-**Báo sai:** 20 lượt tìm có vật gây nhiễu, so sánh có / không có luật 3 frame. Số lần báo sai mỗi lượt: có luật `[…]`, không luật `[…]`, giảm `[…]%`.
+**Báo sai:** 20 lượt tìm có vật gây nhiễu, so sánh có / không có luật 3 frame. Số lần báo sai mỗi lượt: có luật `16`, không luật `34`, giảm `52.9%`.
 
 **Độ trễ** (từ log `VIA_METRIC`, `python eval/eval.py latency`):
-- Suy luận YOLO: `[…]` ms
-- Từ frame đến lúc phản hồi: `[…]` ms
+- Suy luận YOLO: `133.22` ms
+- Từ frame đến lúc phản hồi: `137.63` ms
 - Máy test: `[…]`
 
 ## 5. Hạn chế
