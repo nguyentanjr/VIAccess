@@ -203,9 +203,12 @@ CompositionLocalProvider(LocalConfiguration provides overriddenConfiguration) {
                                     android.widget.Toast.LENGTH_LONG
                                 ).show()
                             }
+                            // Cuộc gọi / app khác giành loa / rút tai nghe: dừng như lệnh "dừng", nói "tiếp" để đọc tiếp.
+                            ttsManager.onAudioInterrupted = { feedback.pauseSpeech() }
                             onDispose {
                                 ttsManager.onVietnameseVoiceMissing = null
                                 ttsManager.onInitFailed = null
+                                ttsManager.onAudioInterrupted = null
                             }
                         }
                         if (showMissingVoice) {

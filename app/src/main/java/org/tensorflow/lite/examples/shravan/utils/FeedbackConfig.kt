@@ -14,6 +14,8 @@ object FeedbackConfig {
     const val GUIDANCE_WINDOW_MS = 60_000L
     /** Sau khi TTS dừng, chờ thêm khoảng này trước khi coi là rảnh (tránh mic nghe lại TTS). */
     const val TTS_TAIL_BUFFER_MS = 500L
+    /** Đọc xong chờ khoảng này mới trả audio focus (nhạc app khác to lại), phòng lời kế tiếp nối ngay. */
+    const val AUDIO_FOCUS_RELEASE_DELAY_MS = 600L
 
     // --- Camera / độ sáng (PLAN 4.2, ưu tiên 1) ---
     const val DARK_LUMINANCE_ON = 40.0

@@ -1,6 +1,13 @@
 package org.tensorflow.lite.examples.shravan.utils
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.media.AudioAttributes
+import android.media.AudioFocusRequest
+import android.media.AudioManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -32,8 +39,84 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
     )
     private val pendingRequests = mutableListOf<PendingSpeakRequest>()
 
+    // --- Audio focus + rút tai nghe ---
+    private val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    private var hasAudioFocus = false
+    private val focusListener = AudioManager.OnAudioFocusChangeListener { change ->
+        when (change) {
+            // Cuộc gọi, app khác giành loa: dừng lời đang đọc (người dùng nói "tiếp" để đọc lại).
+            AudioManager.AUDIOFOCUS_LOSS,
+            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                hasAudioFocus = false
+                interrupt("audio_focus_loss")
+            }
+        }
+    }
+    private val focusRequest: AudioFocusRequest? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK)
+                .setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build()
+                )
+                .setOnAudioFocusChangeListener(focusListener, mainHandler)
+                .build()
+        } else null
+
+    /** Tai nghe (có dây / bluetooth) bị rút khi đang đọc: dừng để không phát to ra loa ngoài. */
+    private val noisyReceiver = object : BroadcastReceiver() {
+        override fun onReceive(c: Context?, intent: Intent?) {
+            if (intent?.action == AudioManager.ACTION_AUDIO_BECOMING_NOISY) interrupt("headset_unplugged")
+        }
+    }
+
+    /** Bị ngắt do mất audio focus hoặc rút tai nghe. Gọi trên main thread. */
+    var onAudioInterrupted: (() -> Unit)? = null
+
     init {
         tts = TextToSpeech(context.applicationContext, this)
+        context.applicationContext.registerReceiver(
+            noisyReceiver, IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+        )
+    }
+
+    private fun interrupt(reason: String) {
+        if (tts?.isSpeaking != true) return
+        Log.d("TTSManager", "Interrupted: $reason")
+        val cb = onAudioInterrupted
+        if (cb != null) cb() else tts?.stop()
+        abandonAudioFocus()
+    }
+
+    private fun requestAudioFocus() {
+        if (hasAudioFocus) return
+        val result = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioManager.requestAudioFocus(focusRequest!!)
+        } else {
+            @Suppress("DEPRECATION")
+            audioManager.requestAudioFocus(
+                focusListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK
+            )
+        }
+        hasAudioFocus = result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED
+    }
+
+    private fun abandonAudioFocus() {
+        if (!hasAudioFocus) return
+        hasAudioFocus = false
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            audioManager.abandonAudioFocusRequest(focusRequest!!)
+        } else {
+            @Suppress("DEPRECATION")
+            audioManager.abandonAudioFocus(focusListener)
+        }
+    }
+
+    /** Trả loa cho app khác (nhạc to lại) khi đã đọc xong hết, chờ một chút phòng lời kế tiếp. */
+    private val releaseFocusIfIdle = Runnable {
+        if (tts?.isSpeaking != true) abandonAudioFocus()
     }
 
     override fun onInit(status: Int) {
@@ -98,6 +181,8 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
     /** Chỉ gọi callback của đúng lời vừa kết thúc; lời cũ bị ngắt không được gọi callback của lời mới. */
     private fun finish(utteranceId: String?) {
         lastSpeechEndTime = System.currentTimeMillis()
+        mainHandler.removeCallbacks(releaseFocusIfIdle)
+        mainHandler.postDelayed(releaseFocusIfIdle, FeedbackConfig.AUDIO_FOCUS_RELEASE_DELAY_MS)
         mainHandler.post {
             if (utteranceId == currentUtteranceId) {
                 val listener = onCompletionListener
@@ -173,6 +258,8 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
                 Log.e("TTSManager", "Error setting audio parameters", e)
             }
             
+            mainHandler.removeCallbacks(releaseFocusIfIdle)
+            requestAudioFocus()
             try {
                 val result = tts?.speak(text, queueMode, params, utteranceId)
                 if (result == TextToSpeech.ERROR) {
@@ -197,6 +284,7 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
     fun stopAll() {
         pendingRequests.clear()
         tts?.stop()
+        abandonAudioFocus()
     }
 
     fun repeatLast() {
@@ -220,5 +308,12 @@ class TTSManager(private val context: Context) : TextToSpeech.OnInitListener {
     fun destroy() {
         tts?.stop()
         tts?.shutdown()
+        abandonAudioFocus()
+        mainHandler.removeCallbacks(releaseFocusIfIdle)
+        try {
+            context.applicationContext.unregisterReceiver(noisyReceiver)
+        } catch (e: IllegalArgumentException) {
+            // chưa đăng ký
+        }
     }
 }
